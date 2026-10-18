@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@font-face {
+    font-family: "Montserrat Arabic";
+    src: url("./assets/fonts/ArbFONTS-Montserrat-Arabic-SemiBold.ttf") format("truetype");
+    font-style: normal;
+}
+
+html, body {
+    font-family: "Montserrat Arabic", sans-serif;
+    overflow-x: hidden; /* لمنع السكرول الأفقي نهائياً */
+    width: 100%;
+    max-width: 100%;
+}
+
+/* الوضع المظلم يعتمد على كلاس .dark على عنصر html */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* الشكل البيضاوي خلف النافبار - لايت */
+.nav-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: -10;
+  width: 863px;
+  max-width: 100%;
+  height: 194px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse closest-side at 50% 50%,
+    rgba(56, 189, 248, 0.34) 0%,
+    rgba(125, 211, 252, 0.24) 45%,
+    rgba(186, 230, 253, 0.10) 78%,
+    transparent 100%
+  );
+}
+
+/* دارك */
+.dark .nav-glow {
+  background: radial-gradient(
+    ellipse closest-side at 50% 50%,
+    rgba(22, 110, 180, 0.55) 0%,
+    rgba(14, 80, 140, 0.32) 50%,
+    rgba(10, 55, 100, 0.12) 80%,
+    transparent 100%
+  );
+}
+
+@keyframes pulseScale {
+  0%, 100% { transform: scale(1) }
+  50% { transform: scale(1.09) }
+}
