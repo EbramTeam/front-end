@@ -28,7 +28,7 @@ export default function App() {
         <About />
         <Features />
         <HowItWorks />
-        {/* <Team /> */}
+        <Team />
       </div>
     </>
   )
