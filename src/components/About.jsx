@@ -5,6 +5,7 @@ import { aboutItems } from '../data/content'
 export default function About() {
   return (
     <section
+      id="about"
       dir="ltr"
       className="relative w-full max-w-[1920px] mx-auto px-5 sm:px-12 lg:px-20 py-14 sm:py-20 overflow-hidden"
     >

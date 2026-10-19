@@ -1,0 +1,163 @@
+import { useState } from 'react'
+import { contactInfo } from '../data/content'
+import { contactBg, logoMark } from '../assets/images'
+
+export default function Contact() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: '',
+  })
+  const [submitted, setSubmitted] = useState(false)
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    setSubmitted(true)
+    setTimeout(() => {
+      setSubmitted(false)
+      setFormData({ name: '', email: '', message: '' })
+    }, 4000)
+  }
+
+  return (
+    <section
+      id="contact"
+      dir="rtl"
+      className="relative py-16 sm:py-24 overflow-hidden"
+    >
+      {/* خلفية السيكشن الأصلية مع الفراشة والموجات */}
+      <img
+        src={contactBg}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-left sm:object-center select-none"
+      />
+
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-12 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+          
+          {/* الجانب الأيمن (معلومات الاتصال والأيقونات المخصصة) */}
+          <div className="lg:col-span-6 space-y-8 text-right">
+            <div>
+              <div className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-[#009ef7] lg:text-base">
+                <span>تواصل معنا</span>
+                <img src={logoMark} alt="" className="h-5 w-5 object-contain select-none" />
+              </div>
+              <h2 className="text-2xl font-black leading-snug text-[#01203d] dark:text-white md:text-3xl lg:text-[40px]">
+                لا تتردد في مراسلة إبرام في أي وقت
+              </h2>
+            </div>
+
+            <div className="space-y-6 pt-2">
+              {contactInfo.map((item) => (
+                <div
+                  key={item.id}
+                  className="group flex items-center gap-4 sm:gap-5 transition-transform duration-300 hover:-translate-x-1"
+                >
+                  {/* الدائرة الزجاجية ثلاثية الأبعاد الحاضنة للأيقونة */}
+                  <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-gradient-to-b from-white to-[#d7eeff] shadow-[0_8px_20px_rgba(0,119,221,0.22)] border border-white flex items-center justify-center p-3 shrink-0 backdrop-blur-sm group-hover:scale-105 transition-transform duration-300">
+                    <img
+                      src={item.icon}
+                      alt={item.alt || item.title}
+                      className="w-full h-full object-contain filter drop-shadow-sm"
+                    />
+                  </div>
+
+                  {/* النصوص */}
+                  <div className="text-right">
+                    <h3 className="text-base sm:text-lg font-bold text-[#01203d] dark:text-white">
+                      {item.title}
+                    </h3>
+                    {item.link ? (
+                      <a
+                        href={item.link}
+                        className="text-sm sm:text-base font-semibold text-gray-600 dark:text-gray-300 hover:text-[#009ef7] transition-colors"
+                        dir="ltr"
+                      >
+                        {item.value}
+                      </a>
+                    ) : (
+                      <p className="text-sm sm:text-base font-semibold text-gray-500 dark:text-gray-400">
+                        {item.value}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* الجانب الأيسر (بطاقة النموذج) */}
+          <div className="lg:col-span-6 flex justify-center lg:justify-start">
+            <div className="w-full max-w-xl rounded-[28px] sm:rounded-[36px] bg-white p-7 sm:p-10 shadow-[0_20px_60px_-15px_rgba(0,100,200,0.18)] border border-white/80 dark:bg-[#0a3560]/85 dark:border-white/10 backdrop-blur-md">
+              
+              {submitted ? (
+                <div className="py-12 text-center">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
+                    <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">تم إرسال رسالتك بنجاح!</h3>
+                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-300">سنتواصل معك في أقرب وقت ممكن.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+                  <div>
+                    <label className="mb-2 block text-xs sm:text-sm font-bold text-[#01203d] dark:text-gray-200">
+                      اسمك الكامل
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="ادخل اسمك الكامل"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full rounded-full border border-gray-200 bg-[#f7faff] px-6 py-3.5 text-right text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#009ef7] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#009ef7]/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-xs sm:text-sm font-bold text-[#01203d] dark:text-gray-200">
+                      البريد الإلكتروني
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="farahherez@gmail.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full rounded-full border border-gray-200 bg-[#f7faff] px-6 py-3.5 text-right text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#009ef7] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#009ef7]/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-xs sm:text-sm font-bold text-[#01203d] dark:text-gray-200">
+                      رسالتك
+                    </label>
+                    <textarea
+                      rows="4"
+                      required
+                      placeholder="أخبرنا كيف يمكننا مساعدتك؟"
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      className="w-full rounded-[24px] border border-gray-200 bg-[#f7faff] px-6 py-4 text-right text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#009ef7] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#009ef7]/20 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500 resize-none h-36"
+                    ></textarea>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full rounded-full bg-[#009ef7] py-3.5 sm:py-4 text-center font-bold text-white text-base shadow-lg shadow-sky-500/25 transition-all duration-300 hover:bg-[#008be3] hover:shadow-sky-500/40 active:scale-[0.99] cursor-pointer"
+                  >
+                    إرسال
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  )
+}

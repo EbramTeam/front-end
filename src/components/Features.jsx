@@ -21,7 +21,7 @@ const badgePosition = {
 
 export default function Features() {
   return (
-    <section dir="rtl" className="w-full bg-[#e4f1fa] dark:bg-[#050f26] py-16 px-4 sm:px-16 lg:px-28 ">
+    <section id="features" dir="rtl" className="w-full bg-[#e4f1fa] dark:bg-[#050f26] py-16 px-4 sm:px-16 lg:px-28 ">
       {/* تدرجات الألوان والسهم */}
       <svg width="0" height="0" className="absolute" aria-hidden="true">
         <defs>
