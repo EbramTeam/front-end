@@ -533,7 +533,7 @@ const strokeProps = {
 }
 
 const ChevronsLeft = () => (
-  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" {...strokeProps}>
+  <svg className="h-5 w-5" viewBox="0 0 24 24" {...strokeProps}>
     <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5" />
   </svg>
 )
@@ -615,7 +615,7 @@ export default function Footer() {
             <img
               src={logo}
               alt="IBRAM"
-              className="h-auto w-32 object-contain sm:w-36"
+              className="h-auto w-32 object-contain sm:w-36 cursor-pointer"
             />
             <p className="max-w-xs text-[13px] font-medium leading-[1.9] text-white sm:text-sm">
               منصة إبرام لإدارة المشتريات، تأسست لتطوير تجربة المشتريات الرقمية
@@ -681,7 +681,7 @@ export default function Footer() {
                   aria-label="اشتراك"
                   className="absolute left-2.5 z-10 flex h-6 w-6 cursor-pointer items-center justify-center text-white transition-transform hover:scale-110 active:scale-95"
                 >
-                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.8 7.2l-2.1 10c-.15.7-.55.87-1.1.54l-3-2.2-1.45 1.4c-.16.16-.3.3-.6.3l.2-3.05 5.55-5c.24-.2-.05-.33-.38-.13l-6.85 4.3-2.95-.92c-.64-.2-.65-.64.14-.95l11.5-4.4c.53-.2 1 .13.83.95z" />
                   </svg>
                 </button>
@@ -747,7 +747,7 @@ export default function Footer() {
         type="button"
         onClick={scrollToTop}
         aria-label="العودة للأعلى"
-        className={`fixed bottom-6 left-6 z-50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#009ef7] text-white shadow-lg transition-all duration-300 hover:bg-[#008be3] hover:scale-110 active:scale-95 ${
+        className={`fixed bottom-[52px] left-6 z-50 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-[#009ef7] text-white shadow-lg transition-all duration-300 hover:bg-[#008be3] hover:scale-110 active:scale-95 ${
           showTop
             ? 'translate-y-0 opacity-100'
             : 'pointer-events-none translate-y-4 opacity-0'

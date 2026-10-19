@@ -129,14 +129,14 @@ export default function CtaBanner() {
         src={ctaBg}
         alt=""
         aria-hidden="true"
-        className="pointer-events-none select-none absolute top-0 right-0 z-0 h-auto w-[150px] sm:w-[200px] lg:w-[16%] lg:min-w-[200px] mix-blend-multiply dark:mix-blend-normal dark:opacity-20"
+        className="pointer-events-none select-none opacity-60 absolute top-0 right-0 z-0 h-auto w-[150px] sm:w-[200px] lg:w-[16%] lg:min-w-[200px] mix-blend-multiply dark:mix-blend-normal dark:opacity-20"
         style={butterflyMask}
       />
 
       <div className="relative z-10 mx-auto max-w-[1600px] px-[4%]">
         {/* البطاقة: زوايا علوية فقط، وملتصقة بأسفل السكشن */}
         <div
-          className="relative flex flex-col lg:flex-row items-center rounded-t-[24px] lg:rounded-t-[28px] pt-8 px-6 pb-0 lg:py-0 lg:px-[4%] lg:h-[var(--h)]"
+          className="relative flex flex-col lg:flex-row items-center rounded-t-[24px]  lg:rounded-t-[28px] pt-8 px-6 pb-0 lg:py-0 lg:px-[4%] lg:h-[var(--h)]"
           style={{
             background: 'linear-gradient(180deg, #004784 0%, #007EEA 100%)',
           }}
