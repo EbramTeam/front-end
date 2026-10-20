@@ -66,7 +66,7 @@ export default function HowItWorks() {
                 </p>
               </div>
 
-              {/* السهم بين الكروت (الكرت الأخير بدون سهم) */}
+              
               {i < steps.length - 1 && (
                 <svg
                   className="absolute -left-[64px] top-[calc(49%-18px)] hidden h-[37px] w-[56px] text-black dark:text-white transition-transform duration-300 group-hover:-translate-x-2 lg:block"

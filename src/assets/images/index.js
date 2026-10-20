@@ -21,6 +21,12 @@ import teamMohammedWael from './team-mohammed-wael.jpg'
 import teamRawaaJabr from './team-rawaa-jabr.png'
 import teamAhmadMadhoun from './team-ahmad-madhoun.jpg'
 import teamDimaYounes from './team-dima-younes.jpg'
+import ctaBg from './ctaBg.png'
+import ctaBusinessman from './ctabusinessman.png'
+import contactBg from './contact-bg.png'
+import iconPhone from './icon-phone.png'
+import iconWeb from './icon-web.png'
+
 
 export {
   xIcon,
@@ -45,4 +51,10 @@ export {
   teamRawaaJabr,
   teamAhmadMadhoun,
   teamDimaYounes,
+  ctaBg,
+  ctaBusinessman,
+  contactBg,
+  iconPhone,
+  iconWeb,
+  
 }

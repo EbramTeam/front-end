@@ -13,22 +13,24 @@ import {
   teamRawaaJabr,
   teamAhmadMadhoun,
   teamDimaYounes,
+  iconPhone,
+  iconWeb,
 } from '../assets/images'
 
 // روابط القائمة بالترتيب الظاهر في الديسكتوب (من اليمين لليسار عبر flex-row-reverse الأصلي)
 export const desktopNavLinks = [
-  { label: 'تواصل معنا', href: '#' },
-  { label: 'الباقات', href: '#' },
-  { label: 'المميزات', href: '#' },
-  { label: 'من نحن', href: '#' },
+  { label: 'تواصل معنا', href: '#contact' },
+  { label: 'الباقات', href: '#pricing' },
+  { label: 'المميزات', href: '#features' },
+  { label: 'من نحن', href: '#about' },
 ]
 
 // قائمة الجوال (الرئيسية أولًا)
 export const mobileNavLinks = [
-  { label: 'من نحن', href: '#' },
-  { label: 'المميزات', href: '#' },
-  { label: 'الباقات', href: '#' },
-  { label: 'تواصل معنا', href: '#' },
+  { label: 'من نحن', href: '#about' },
+  { label: 'المميزات', href: '#features' },
+  { label: 'الباقات', href: '#pricing' },
+  { label: 'تواصل معنا', href: '#contact' },
 ]
 
 export const languages = [
@@ -129,3 +131,97 @@ export const team = [
   { name: 'أحمد المدهون', role: 'مصمم جرافيك', photo: teamAhmadMadhoun },
   { name: 'ديما يونس', role: 'مصممة جرافيك', photo: teamDimaYounes },
 ]
+
+// القسم السابع: الباقات (الأسعار)
+export const pricingPlans = [
+  {
+    id: 'basic',
+    name: 'الخطة الأساسية',
+    subtitle: 'للجهات الصغيرة التي تبدأ بتنظيم مشترياتها.',
+    price: '49',
+    currency: '$',
+    period: 'شهرياً',
+    features: [
+      'إنشاء طلبات الشراء ومتابعتها',
+      'مسار اعتماد أساسي',
+      'تسجيل عروض الأسعار',
+      'دعم عبر البريد الإلكتروني',
+    ],
+    isPopular: false,
+    ctaText: 'ابدأ الآن',
+  },
+  {
+    id: 'pro',
+    name: 'الخطة الاحترافية',
+    badge: 'الأكثر طلباً',
+    subtitle: 'للجهات التي تحتاج إلى إدارة عدد أكبر من الطلبات وإجراءات الاعتماد',
+    price: '99',
+    currency: '$',
+    period: 'شهرياً',
+    features: [
+      'كل ما في الباقة الأساسية',
+      'مسارات اعتماد حسب الصلاحيات',
+      'توثيق إجراءات لجنة فتح المظاريف',
+      'دعم عبر البريد الإلكتروني',
+    ],
+    isPopular: true,
+    ctaText: 'ابدأ الآن',
+  },
+  {
+    id: 'enterprise',
+    name: 'خطة الشركات',
+    subtitle: 'للجهات التي تحتاج إلى نطاق استخدام وصلاحيات أوسع.',
+    price: '190',
+    currency: '$',
+    period: 'شهرياً',
+    features: [
+      'كل ما في الباقة الاحترافية',
+      'إدارة صلاحيات أوسع للأقسام',
+      'نطاق استخدام أوسع',
+      'مرافقة في الإعداد الأولي',
+    ],
+    isPopular: false,
+    ctaText: 'ابدأ الآن',
+  },
+]
+
+// القسم الثامن: تواصل معنا
+export const contactInfo = [
+  {
+    id: 'question',
+    title: 'هل لديك أي استفسار؟',
+    value: 'مجاناً',
+    icon: iconEnvelopes,
+    alt: 'استفسار',
+  },
+  {
+    id: 'email',
+    title: 'راسلنا عبر البريد الإلكتروني',
+    value: 'ibram@gmail.com',
+    link: 'mailto:ibram@gmail.com',
+    icon: iconPhone,
+    alt: 'البريد الإلكتروني',
+  },
+  {
+    id: 'location',
+    title: 'تفضل بزيارتنا في أي وقت',
+    value: 'فلسطين - غزة',
+    icon: iconWeb,
+    alt: 'زيارتنا',
+  },
+]
+
+// روابط التذييل (Footer)
+export const footerLinks = {
+  quickLinks: [
+    { label: 'الرئيسية', href: '#' },
+    { label: 'من نحن', href: '#about' },
+    { label: 'المميزات', href: '#features' },
+    { label: 'الباقات', href: '#pricing' },
+    { label: 'تواصل معنا', href: '#contact' },
+  ],
+  contact: [
+    { label: 'info@ibram.com', href: 'mailto:info@ibram.com', type: 'email' },
+    { label: 'فلسطين - غزة', href: '#', type: 'location' },
+  ],
+}

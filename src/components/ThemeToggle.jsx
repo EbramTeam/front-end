@@ -1,4 +1,4 @@
-// زر تبديل الوضع الليلي: القمر يظهر في الفاتح، والشمس تظهر في المظلم
+
 export default function ThemeToggle({ isDark, onToggle }) {
   return (
     <button
