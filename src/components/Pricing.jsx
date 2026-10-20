@@ -211,21 +211,7 @@ export default function Pricing() {
                     : 'bg-[#eef5fe] text-[#01203d] dark:bg-[#0a3560]/60 dark:text-white'
                 }`}
               >
-                {/* شارة الأكثر طلباً: أعلى يسار الكارد، تبرز شوي خارج حافته اليسرى */}
-                {/* {plan.badge && (
-                  <div className="absolute -left-3 top-2 z-20 select-none rounded-xl bg-[#ffd600] px-4 py-2 text-xs font-bold text-black shadow-md">
-                    {plan.badge}
-                  </div>
-                )} */}
 
-                {/* {plan.badge && (
-  <div
-    className="absolute -left-8 top-3 z-20 select-none rounded-full bg-[#ffd600] px-7 py-3 text-base font-extrabold leading-none text-black"
-    style={{ boxShadow: '-4px 6px 14px rgba(255, 214, 0, 0.45)' }}
-  >
-    {plan.badge}
-  </div>
-)} */}
                 
       {plan.badge && (
   <div className="absolute -left-4 top-2.5 z-30 select-none">
