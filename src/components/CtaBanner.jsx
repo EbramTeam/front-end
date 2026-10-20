@@ -134,14 +134,14 @@ export default function CtaBanner() {
       />
 
       <div className="relative z-10 mx-auto max-w-[1600px] px-[4%]">
-        {/* البطاقة: زوايا علوية فقط، وملتصقة بأسفل السكشن */}
+       
         <div
           className="relative flex flex-col lg:flex-row items-center rounded-t-[24px]  lg:rounded-t-[28px] pt-8 px-6 pb-0 lg:py-0 lg:px-[4%] lg:h-[var(--h)]"
           style={{
             background: 'linear-gradient(180deg, #004784 0%, #007EEA 100%)',
           }}
         >
-          {/* النص: يمين */}
+          
           <div className="relative z-10 w-full lg:w-[50%] text-right space-y-2.5 pb-6 lg:pb-0">
             <h2 className="text-xl sm:text-2xl lg:text-[26px] font-bold text-white leading-tight">
               ابدأ بتنظيم مشترياتك مع إبرام
@@ -172,7 +172,7 @@ export default function CtaBanner() {
             </div>
           </div>
 
-          {/* الرجل: يسار، قاعدته على حافة البطاقة وراسه فوقها */}
+          
           <img
             src={ctaBusinessman}
             alt="إبرام - شريكك في تنظيم المشتريات"

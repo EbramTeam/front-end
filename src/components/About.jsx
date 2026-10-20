@@ -62,11 +62,12 @@ export default function About() {
               ))}
             </div>
           </div>
-        </div>
+        </div>       
 
-        {/* القسم الأيمن: العنوان والنص */}
+
+       
         <div dir="rtl" className="order-1 lg:order-2 text-right min-w-0">
-          {/* شارة "من نحن؟" */}
+          
           <div className="inline-flex items-center gap-[clamp(2px,0.21vw,4px)] mb-[clamp(8px,0.8vw,16px)] font-semibold text-sky-600 dark:text-[#0a8cf0] text-[length:clamp(0.9rem,1.05vw,1.25rem)]">
             <img src={logoMark} alt="IBRAM" className="w-[50px] h-auto object-contain select-none" />
             <span className="mr-[-9px] font-[700] text-[18px]">من نحن؟</span>

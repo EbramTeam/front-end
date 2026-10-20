@@ -6,14 +6,14 @@ const gradientText = 'bg-[linear-gradient(90deg,#017AE2_0%,#00ACF0_100%)] bg-cli
 const connectorClass =
   "max-lg:after:mt-8 max-lg:after:block max-lg:after:h-12 max-lg:after:border-l-[2.5px] max-lg:after:border-dashed max-lg:after:border-[#0284c7] max-lg:after:content-['']"
 
-// خلفية الدائرة الداخلية حسب النوع
+
 const innerCircle = {
   light:
     'bg-[linear-gradient(180deg,#f1f4f9_0%,#cfe4fa_100%)] shadow-[inset_0_-8px_16px_rgba(47,140,245,.25),inset_0_0_0_1px_rgba(255,255,255,.8)] dark:bg-[linear-gradient(180deg,#1a3d70,#0d2347)] dark:shadow-none',
   dark: 'bg-[linear-gradient(180deg,#000_0%,#03194a_45%,#0a63e6_100%)] shadow-[0_8px_20px_rgba(10,99,230,.4)]',
 }
 
-// موضع ودوران سهم الرقم حسب النوع
+
 const badgePosition = {
   light: 'absolute -top-[2%] -left-[14%]  h-[30%] w-[40%] -rotate-[24deg]',
   dark: 'absolute -bottom-[4%] -left-[12%]  h-[30%] w-[40%] rotate-[18deg]',
@@ -22,7 +22,7 @@ const badgePosition = {
 export default function Features() {
   return (
     <section id="features" dir="rtl" className="relative w-full bg-[#e4f1fa] py-16 dark:bg-[#050f26]">
-      {/* تدرجات الألوان والسهم */}
+     
       <svg width="0" height="0" className="absolute" aria-hidden="true">
         <defs>
           <linearGradient id="gT" x1="0" y1="0" x2="1" y2="0">
@@ -33,9 +33,9 @@ export default function Features() {
         </defs>
       </svg>
 
-      {/* نفس الحاوية المستخدمة بباقي الأقسام */}
+      
       <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-12">
-        {/* شارة العنوان والعنوان الرئيسي */}
+       
         <div className="mb-16 flex flex-col items-center text-center">
           <span
             className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[18px] font-[700] ${gradientText} bg-white/50 dark:bg-[#0c2147]/50`}
@@ -49,7 +49,7 @@ export default function Features() {
           </h2>
         </div>
 
-        {/* شبكة الدوائر بعرض كامل وتوزيع متناسق */}
+        
         <div className="relative flex w-full flex-col items-center justify-between gap-12 lg:flex-row lg:items-start lg:gap-6">
           <svg
             className="pointer-events-none absolute left-0 top-[55px] z-0 hidden h-[100px] w-full scale-y-100 rotate-[0deg] transform overflow-visible lg:block"

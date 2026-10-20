@@ -124,7 +124,7 @@ export default function Header({ isDark, onToggleTheme }) {
         </button>
       </div>
 
-      {/* قائمة الجوال */}
+      
       <div
         id="mobileMenu"
         ref={menuRef}

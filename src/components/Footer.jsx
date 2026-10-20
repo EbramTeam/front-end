@@ -610,7 +610,7 @@ export default function Footer() {
     <footer dir="rtl" className="bg-[#01203d] text-white">
       <div className="mx-auto max-w-[1400px] px-4 pb-10 pt-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
-          {/* العمود 1: الشعار والوصف */}
+        
           <div className="space-y-4 lg:col-span-4">
             <img
               src={logo}
@@ -624,7 +624,7 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* العمود 2: روابط سريعة */}
+          
           <div className="space-y-5 lg:col-span-2">
             <h4 className="text-base font-semibold text-[#009ef7]">روابط سريعة</h4>
             <ul className="space-y-3 text-sm text-white">
@@ -642,7 +642,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* العمود 3: تواصل معنا */}
+          
           <div className="space-y-5 lg:col-span-3">
             <h4 className="text-base font-semibold text-[#009ef7]">تواصل معنا</h4>
             <ul className="space-y-3.5 text-sm font-medium text-white">
@@ -667,7 +667,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* العمود 4: النشرة الإخبارية */}
+          
           <div className="space-y-5 lg:col-span-3">
             <h4 className="text-base font-semibold text-[#009ef7]">ابقَ على اطلاع</h4>
             <p className="text-sm font-bold text-white">
@@ -706,17 +706,17 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* الشريط السفلي: الخط الفاصل بعرض الصفحة كاملة */}
+      
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-4 px-4 py-4 text-xs sm:px-6 md:flex-row lg:px-8">
-          {/* اليمين: حقوق النشر */}
+          
           <p className="text-white">
             © جميع الحقوق محفوظة{' '}
             <span className="inline-block bg-[#0b57d0] px-1 text-white">IBRAM</span>{' '}
             <span className="inline-block">2026</span>
           </p>
 
-          {/* الوسط: السوشيال */}
+          
           <div className="flex items-center gap-6 text-white">
             {socials.map((s) => (
               <a
@@ -730,7 +730,7 @@ export default function Footer() {
             ))}
           </div>
 
-          {/* اليسار: السياسات */}
+          
           <div className="flex items-center gap-5">
             <a href="#" className="text-slate-300 underline underline-offset-2 transition-colors hover:text-white">
               سياسة الخصوصية
@@ -742,7 +742,7 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* زر العودة للأعلى: ثابت أسفل اليسار، يظهر عند النزول بالصفحة */}
+      
       <button
         type="button"
         onClick={scrollToTop}

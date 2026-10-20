@@ -241,7 +241,7 @@ export default function Pricing() {
       }}
     />
 
-    {/* الشارة */}
+   
     <div
       className="relative flex h-[42.5px] items-center bg-[#FFD600] px-8 text-base font-[600] leading-none text-[#000000]"
       style={{

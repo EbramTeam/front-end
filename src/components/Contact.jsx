@@ -380,20 +380,19 @@ export default function Contact() {
       <div className="relative z-10 mx-auto max-w-[1440px] px-4 sm:px-6 lg:mb-[60px] ">
         <div className="flex flex-col items-center gap-10 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
 
-          {/* الجانب الأيمن (معلومات الاتصال) */}
+         
           <div className="w-full space-y-8 text-right lg:w-[480px] lg:shrink-0">
             <div>
               <div className="mb-3 inline-flex items-center gap-2 bg-gradient-to-r from-[#017ae2] to-[#00acf0] bg-clip-text text-sm font-semibold text-transparent lg:text-base">
                 <img src={logoMark} alt="" className="ml-[-10px] h-10 w-10 select-none object-contain" />
                 <span>تواصل معنا</span>
               </div>
-              {/* <h2 className="text- font-[700] leading-snug text-[#000000] dark:text-white md:text-3xl lg:text-[px]">
-                لا تتردد في مراسلة إبرام في أي وقت
-              </h2> */}
+             
 
               <h2 className="whitespace-nowrap text-[clamp(18px,6vw,28px)] font-[700] leading-snug text-[#000000] dark:text-white md:text-3xl lg:text-[37px]">
-  لا تتردد في مراسلة إبرام في أي وقت
-</h2>
+           لا تتردد في مراسلة إبرام في أي وقت
+           </h2>
+
             </div>
 
             <div className="space-y-6 pt-2">
@@ -434,7 +433,7 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* الجانب الأيسر (بطاقة النموذج) - على أقصى الشمال */}
+          
           <div className="relative z-10 w-full lg:w-[488px] lg:shrink-0">
             <div className="w-full rounded-[28px] border border-white/80 bg-white px-6 py-6 shadow-[0_20px_60px_-15px_rgba(0,100,200,0.18)] backdrop-blur-md dark:border-white/10 dark:bg-[#0a3560]/85">
 
