@@ -122,14 +122,16 @@ export default function CtaBanner() {
     <section
       dir="rtl"
       style={{ '--h': 'clamp(150px, 15.4vw, 210px)' }}
-      className="relative overflow-hidden bg-white dark:bg-[#002649] pt-16 sm:pt-20 lg:pt-[calc(var(--h)*0.9+40px)] pb-0 transition-colors duration-300"
+      className="relative overflow-hidden bg-white  dark:bg-[#001D37] pt-16 sm:pt-20 lg:pt-[calc(var(--h)*0.9+40px)] pb-0 transition-colors duration-300"
     >
       {/* الفراشة: أعلى اليمين، تتلاشى من اليسار ومن الأسفل */}
-      <img
+
+
+ <img
         src={ctaBg}
         alt=""
         aria-hidden="true"
-        className="pointer-events-none select-none opacity-60 absolute top-0 right-0 z-0 h-auto w-[150px] sm:w-[200px] lg:w-[16%] lg:min-w-[200px] mix-blend-multiply dark:mix-blend-normal dark:opacity-20"
+        className="pointer-events-none select-none opacity-60 absolute top-2 right-4 z-0 h-auto w-[150px] sm:w-[200px] lg:w-[16%] lg:min-w-[200px] mix-blend-normal dark:invert dark:hue-rotate-180 dark:mix-blend-screen dark:opacity-80"
         style={butterflyMask}
       />
 
