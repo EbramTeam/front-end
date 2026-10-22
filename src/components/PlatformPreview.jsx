@@ -54,6 +54,11 @@
 
 
 
+
+
+
+
+
 import { waveLight, waveDark, dashboardLight, dashboardDark } from '../assets/images'
 
 export default function PlatformPreview() {
@@ -61,7 +66,7 @@ export default function PlatformPreview() {
     <section
       id="platform"
       aria-label="عرض المنصة"
-      className="relative overflow-hidden mt-0 pt-0 dark:bg-[#021a33]"
+      className="relative overflow-hidden mt-0 pt-0 dark:bg-[#] lg:pt-14"
     >
       <img
         src={waveLight}
@@ -77,7 +82,7 @@ export default function PlatformPreview() {
       />
 
       <div className="relative z-10 pt-2">
-        <div className="w-[94%] sm:w-[92%] max-w-[1600px] mx-auto pt-4 sm:pt-6">
+        <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-8 lg:px-16 pt-4 sm:pt-6">
           <div
             className="rounded-t-[2rem] sm:rounded-t-[3.5rem] lg:rounded-t-[4.5rem]
               border border-b-0 border-white/60 dark:border-white/20

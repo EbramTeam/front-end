@@ -5,7 +5,7 @@ import { useDismiss } from '../hooks/useDismiss'
 import LanguageMenu from './LanguageMenu'
 import ThemeToggle from './ThemeToggle'
 
-const startGradient = { background: 'linear-gradient(135deg, #00ADF1 0%, #0079E2 100%)' }
+const startGradient = { background: 'linear-gradient(to left, #00ADF1 0%, #0079E2 100%)' }
 
 const desktopLinkClass = 'hover:text-blue-600 dark:hover:text-blue-400 transition-colors'
 const mobileLinkClass =
@@ -34,7 +34,7 @@ export default function Header({ isDark, onToggleTheme }) {
   return (
     <header
       dir="ltr"
-      className="relative z-20 w-full px-4 sm:px-6 lg:px-8 py-2 sm:py-3 flex flex-row-reverse items-center justify-between gap-4"
+      className="relative z-20 w-full px-4 sm:px-8 lg:px-16 py-2 sm:py-3 flex flex-row-reverse items-center justify-between gap-4"
     >
       <div className="nav-glow" aria-hidden="true"></div>
 
@@ -78,10 +78,10 @@ export default function Header({ isDark, onToggleTheme }) {
 
       {/* 3. الأزرار وأيقونات اليسار */}
       <div className="flex flex-1 basis-0 items-center justify-start gap-1 sm:gap-4">
-        {/* زر ابدأ الآن مع تدرج الألوان وحركة الصعود والهبوط */}
+        {/* زر ابدأ الآن بتدرج من اليمين #00ADF1 إلى اليسار #0079E2 مطابق للصورة */}
         <a
           href="#"
-          className="hidden sm:inline-block shrink-0 whitespace-nowrap text-[#000000] font-semibold px-6 py-2.5 rounded-full shadow-lg shadow-blue-500/30 transition-all text-sm animate-bounce"
+          className="hidden sm:inline-block shrink-0 whitespace-nowrap text-[#000000] font-semibold px-6 py-2.5 rounded-full shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-105 hover:-translate-y-1 transition-all duration-300 text-sm cursor-pointer"
           style={startGradient}
         >
           ابدأ الآن
@@ -129,7 +129,7 @@ export default function Header({ isDark, onToggleTheme }) {
         id="mobileMenu"
         ref={menuRef}
         dir="rtl"
-        className={`${menuOpen ? '' : 'hidden'} lg:hidden absolute top-full inset-x-4 sm:inset-x-6 -mt-1 rounded-2xl p-3
+        className={`${menuOpen ? '' : 'hidden'} lg:hidden absolute top-full inset-x-4 sm:inset-x-8 -mt-1 rounded-2xl p-3
           bg-white/95 backdrop-blur-md border border-gray-100 shadow-xl
           dark:bg-[#0a2036]/95 dark:border-white/15 z-40`}
       >
@@ -154,7 +154,7 @@ export default function Header({ isDark, onToggleTheme }) {
         <a
           href="#"
           onClick={closeMenu}
-          className="sm:hidden mt-2 block text-center text-white font-semibold px-6 py-3 rounded-full shadow-md shadow-blue-500/20 transition-all text-sm animate-bounce"
+          className="sm:hidden mt-2 block text-center text-[#000000] font-semibold px-6 py-3 rounded-full shadow-md shadow-blue-500/20 hover:shadow-blue-500/40 hover:scale-105 hover:-translate-y-0.5 transition-all duration-300 text-sm cursor-pointer"
           style={startGradient}
         >
           ابدأ الآن

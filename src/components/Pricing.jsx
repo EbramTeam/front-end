@@ -157,6 +157,13 @@
 
 
 
+
+
+
+
+
+
+
 import { pricingPlans } from '../data/content'
 import { logoMark } from '../assets/images'
 
@@ -165,11 +172,11 @@ export default function Pricing() {
     <section
       id="pricing"
       dir="rtl"
-      className="relative overflow-hidden bg-white py-16 dark:bg-[#002649] sm:py-24"
+      className="relative overflow-hidden bg-white py-16 dark:bg-[#002649] lg:pb-24 lg:pt-14"
     >
-      <div className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-[1720px] px-4 sm:px-8 lg:px-16">
         {/* عنوان القسم */}
-        <div className="mb-12 text-center lg:mb-16">
+        <div className="mb-10 text-center lg:mb-4">
           <div className="mb-3 inline-flex select-none items-center gap-2">
             <img src={logoMark} alt="" className="h-5 w-5 object-contain sm:h-6 sm:w-6" />
             <span

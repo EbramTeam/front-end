@@ -4,6 +4,7 @@ import logo from './logo.png'
 import logoMark from './logo-mark.png'
 import waveLight from './wave-light.png'
 import blueWings from './blueWings.png'
+import blueWingsDark from './blueWings-dark.png'
 import waveDark from './wave-dark.png'
 import dashboardLight from './dashboard-light.png'
 import dashboardDark from './dashboard-dark.png'
@@ -24,6 +25,7 @@ import teamDimaYounes from './team-dima-younes.jpg'
 import ctaBg from './ctaBg.png'
 import ctaBusinessman from './ctabusinessman.png'
 import contactBg from './contact-bg.png'
+import contactBgdark from './contactBg-dark.png'
 import iconPhone from './icon-phone.png'
 import iconWeb from './icon-web.png'
 
@@ -34,6 +36,7 @@ export {
   logoMark,
   waveLight,
   blueWings,
+  blueWingsDark,
   waveDark,
   dashboardLight,
   dashboardDark,
@@ -54,6 +57,7 @@ export {
   ctaBg,
   ctaBusinessman,
   contactBg,
+  contactBgdark,
   iconPhone,
   iconWeb,
   

@@ -1,38 +1,102 @@
 
+// import { xIcon } from '../assets/images'
+
+// export default function TopBar() {
+//   return (
+//     <div className="w-full bg-gradient-to-r from-blue-500 to-sky-400 text-white py-2 px-4 sm:px-8 md:px-10 shadow-md">
+//       <div className="w-full flex flex-col md:flex-row justify-between items-center gap-3 text-xs sm:text-sm">
+//         <div className="flex items-center gap-4 flex-wrap justify-center md:justify-start">
+//           <div className="flex items-center gap-2">
+//             <span className="text-white font-medium">فلسطين ، غزة</span>
+//             <i className="fa-solid fa-location-dot text-white transition-transform duration-300 hover:scale-125 hover:-translate-y-0.5 cursor-pointer"></i>
+//           </div>
+
+//           <div className="hidden sm:block h-4 w-[1px] bg-white/50"></div>
+
+//           <div className="flex items-center gap-2">
+//             <span className="font-medium text-white">info@ibram.com</span>
+//             <i className="fa-solid fa-envelope text-white transition-transform duration-300 hover:scale-125 hover:rotate-6 cursor-pointer"></i>
+//           </div>
+//         </div>
+
+//         <div className="flex items-center gap-3 justify-center md:justify-end flex-wrap">
+//           <div className="flex items-center gap-3 text-sm">
+//             <a
+//               href="#"
+//               className="hover:text-white/80 transition-all duration-300 hover:scale-125 hover:-rotate-12 inline-block"
+//               aria-label="X"
+//             >
+//               <img className="w-3.5 h-3.5" src={xIcon} alt="X" />
+//             </a>
+
+//             <a
+//               href="#"
+//               className="hover:text-white/80 transition-all duration-300 hover:scale-125 hover:-translate-y-1 inline-block"
+//               aria-label="LinkedIn"
+//             >
+//               <i className="fa-brands fa-linkedin-in text-white"></i>
+//             </a>
+
+//             <a
+//               href="#"
+//               className="hover:text-white/80 transition-all duration-300 hover:scale-125 hover:rotate-12 inline-block"
+//               aria-label="Instagram"
+//             >
+//               <i className="fa-brands fa-instagram"></i>
+//             </a>
+
+//             <a
+//               href="#"
+//               className="hover:text-white/80 transition-all duration-300 hover:scale-125 inline-block"
+//               aria-label="Facebook"
+//             >
+//               <i className="fa-brands fa-facebook-f"></i>
+//             </a>
+//           </div>
+//           <span className="font-medium">: تابعونا على </span>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// };
+
+
+
+
 
 import { xIcon } from '../assets/images'
 
 export default function TopBar() {
   return (
-    <div className="w-full bg-gradient-to-r from-blue-500 to-sky-400 text-white py-2 px-4 sm:px-8 md:px-10 shadow-md">
-      <div className="w-full flex flex-col md:flex-row justify-between items-center gap-3 text-xs sm:text-sm">
+    <div className="w-full  bg-gradient-to-r from-blue-500 to-sky-400 text-white py-2.5 px-4 sm:px-8 md:px-10">
+      <div className="w-full flex flex-col md:flex-row justify-between items-center gap-3 text-xs sm:text-[13px]">
         <div className="flex items-center gap-4 flex-wrap justify-center md:justify-start">
           <div className="flex items-center gap-2">
             <span className="text-white font-medium">فلسطين ، غزة</span>
-            <i className="fa-solid fa-location-dot text-white transition-transform duration-300 hover:scale-125 hover:-translate-y-0.5 cursor-pointer"></i>
+            <i className="fa-solid fa-location-dot text-white text-[13px] transition-transform duration-300 hover:scale-125 hover:-translate-y-0.5 cursor-pointer"></i>
           </div>
 
-          <div className="hidden sm:block h-4 w-[1px] bg-white/50"></div>
+          <div className="hidden sm:block h-3.5 w-[1px] bg-white/40"></div>
 
           <div className="flex items-center gap-2">
             <span className="font-medium text-white">info@ibram.com</span>
-            <i className="fa-solid fa-envelope text-white transition-transform duration-300 hover:scale-125 hover:rotate-6 cursor-pointer"></i>
+            <i className="fa-solid fa-envelope text-white text-[13px] transition-transform duration-300 hover:scale-125 hover:rotate-6 cursor-pointer"></i>
           </div>
         </div>
 
         <div className="flex items-center gap-3 justify-center md:justify-end flex-wrap">
-          <div className="flex items-center gap-3 text-sm">
+          <div className="flex items-center gap-3 text-[13px]">
             <a
               href="#"
-              className="hover:text-white/80 transition-all duration-300 hover:scale-125 hover:-rotate-12 inline-block"
+              className="text-white hover:text-white/80 transition-all duration-300 hover:scale-125 hover:-rotate-12 inline-block"
               aria-label="X"
             >
-              <img className="w-3.5 h-3.5" src={xIcon} alt="X" />
+              <img className="w-3 h-3" src={xIcon} alt="X" />
             </a>
 
             <a
               href="#"
-              className="hover:text-white/80 transition-all duration-300 hover:scale-125 hover:-translate-y-1 inline-block"
+              className="text-white hover:text-white/80 transition-all duration-300 hover:scale-125 hover:-translate-y-1 inline-block"
               aria-label="LinkedIn"
             >
               <i className="fa-brands fa-linkedin-in text-white"></i>
@@ -40,7 +104,7 @@ export default function TopBar() {
 
             <a
               href="#"
-              className="hover:text-white/80 transition-all duration-300 hover:scale-125 hover:rotate-12 inline-block"
+              className="text-white hover:text-white/80 transition-all duration-300 hover:scale-125 hover:rotate-12 inline-block"
               aria-label="Instagram"
             >
               <i className="fa-brands fa-instagram"></i>
@@ -48,13 +112,13 @@ export default function TopBar() {
 
             <a
               href="#"
-              className="hover:text-white/80 transition-all duration-300 hover:scale-125 inline-block"
+              className="text-white hover:text-white/80 transition-all duration-300 hover:scale-125 inline-block"
               aria-label="Facebook"
             >
               <i className="fa-brands fa-facebook-f"></i>
             </a>
           </div>
-          <span className="font-medium">: تابعونا على </span>
+          <span className="font-medium text-white">: تابعونا على </span>
         </div>
       </div>
     </div>
