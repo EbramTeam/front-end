@@ -6,7 +6,7 @@ export default function ThemeToggle({ isDark, onToggle }) {
       id="themeToggle"
       type="button"
       onClick={onToggle}
-      className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none"
+      className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none cursor-pointer"
       aria-label="تبديل الوضع"
     >
       <svg

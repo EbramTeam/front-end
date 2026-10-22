@@ -124,7 +124,7 @@ import { useCallback, useRef, useState } from 'react'
 import { useDismiss } from '../hooks/useDismiss'
 import { languages } from '../data/content'
 
-const itemClass = `group w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-sm font-medium text-start transition-colors
+const itemClass = `group w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-sm font-medium text-start transition-colors cursor-pointer
   hover:bg-gray-50 dark:hover:bg-white/5
   data-[active=true]:bg-blue-50 data-[active=true]:text-blue-600
   dark:data-[active=true]:bg-blue-950/60 dark:data-[active=true]:text-blue-400`
@@ -204,7 +204,7 @@ export default function LanguageMenu() {
         data-open={String(open)}
         role="menu"
         dir="rtl"
-        className="absolute left-0 top-full mt-2 w-44 rounded-2xl p-1.5 z-30 origin-top-left
+        className="absolute left-0 top-full mt-2 w-44 rounded-2xl p-1.5 z-50 origin-top-left
           bg-white/95 backdrop-blur-md border border-gray-100 shadow-xl
           dark:bg-[#0a2036]/95 dark:border-white/15
           transition-all duration-200 ease-out

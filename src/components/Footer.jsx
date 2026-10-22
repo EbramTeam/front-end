@@ -3,6 +3,7 @@
 
 
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { logo } from '../assets/images'
 import { footerLinks } from '../data/content'
 
@@ -96,11 +97,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
         
           <div className="space-y-4 lg:col-span-4">
-            <img
-              src={logo}
-              alt="IBRAM"
-              className="h-auto w-32 object-contain sm:w-36 cursor-pointer"
-            />
+            <Link to="/" className="inline-block">
+              <img
+                src={logo}
+                alt="IBRAM"
+                className="h-auto w-32 object-contain sm:w-36 cursor-pointer"
+              />
+            </Link>
             <p className="max-w-xs text-[13px] font-medium leading-[1.9] text-white sm:text-sm">
               منصة إبرام لإدارة المشتريات، تأسست لتطوير تجربة المشتريات الرقمية
               وتسعى لتبسيط الإجراءات وتعزيز الكفاءة والشفافية من خلال حلول ذكية
@@ -216,12 +219,18 @@ export default function Footer() {
 
           
           <div className="flex items-center gap-5">
-            <a href="#" className="text-slate-300 underline underline-offset-2 transition-colors hover:text-white">
+            <Link
+              to="/privacy#privacy"
+              className="text-slate-300 underline underline-offset-2 transition-colors hover:text-white"
+            >
               سياسة الخصوصية
-            </a>
-    <a href="#" className="text-slate-300 underline underline-offset-2 transition-colors hover:text-white">
+            </Link>
+            <Link
+              to="/privacy#terms"
+              className="text-slate-300 underline underline-offset-2 transition-colors hover:text-white"
+            >
               شروط الاستخدام
-            </a>
+            </Link>
           </div>
         </div>
       </div>
