@@ -116,7 +116,7 @@ export default function About() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{
-            duration: 0.8,
+            duration: 0.08,
             ease: [0.22, 1, 0.36, 1],
           }}
           className="order-2 lg:order-1 min-w-0"

@@ -28,9 +28,15 @@ import contactBg from './contact-bg.png'
 import contactBgdark from './contactBg-dark.png'
 import iconPhone from './icon-phone.png'
 import iconWeb from './icon-web.png'
-
+import userHani from './user-hani.jpg'
+import shieldIcon from './shield-icon.png'
+import calendarClock from './calendar-clock.png'
+import supplierIcon from './supplier-icon.png'
+import userKasba from './user-kasba.png'
 
 export {
+  userKasba,
+  supplierIcon,
   xIcon,
   logo,
   logoMark,
@@ -60,5 +66,7 @@ export {
   contactBgdark,
   iconPhone,
   iconWeb,
-  
+  userHani,
+  shieldIcon,
+  calendarClock,
 }
