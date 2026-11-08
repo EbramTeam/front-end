@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMaster, two, fmt, SEED_COUNT } from '../../masterStore.jsx';
+import { useDepartments, useToggleDepartment } from '../../hooks/use-departments.js';
+import { LoadingBlock } from '../../components/Spinner.jsx';
 import { PageHead, Stat, FilterCard, StatusPill, RowActions, Empty, exportCsv } from './Bits.jsx';
 import Cbx from '../../components/Cbx.jsx';
 import { CircleCheckIcon, IdCardIcon, ScalesIcon, OrgChartIcon, ShieldCheckIcon, PauseCircleIcon, DatabaseIcon, DocIcon, ReportIcon } from '../../components/Icons.jsx';
@@ -74,37 +76,39 @@ const dateCell = (r) => <div className="vupd"><b>{r.date}</b><span>{r.by}</span>
 // ---------- الأقسام والإدارات ----------
 export function DepartmentsList() {
   const nav = useNavigate();
-  const { departments: all, remove, toggle } = useMaster();
+  const { departments: all, isLoading } = useDepartments();
+  const { toggleDepartment } = useToggleDepartment();
   const L = useListState('d1');
   const rows = all.filter((r) => L.pass(r, [r.name, r.code], r.parent === L.filter.second || r.name === L.filter.second));
-  const mains = all.filter((d) => d.level === 'main').map((d) => d.name);
-  const kids = (r) => { const n = all.filter((d) => d.parent === r.name).length; return n ? (r.id === 'd1' ? n + 2 : n) + ' أقسام فرعية' : '-'; };
+  const mains = [];
+  const kids = () => '-';
   const cfg = {
     title: 'الأقسام والإدارات', sub: 'تنظيم الهيكل الإداري والمراكز التكليفية والجهات الطالبة لاعتمادات الشراء والميزانيات.',
     exportLabel: 'تصدير الهيكل التنظيمي', addLabel: 'إضافة قسم',
     onExport: () => exportCsv('الهيكل-التنظيمي', ['اسم القسم / الإدارة', 'الرمز التنظيمي', 'القسم الأعلى', 'الحالة'], all.map((r) => [r.name, r.code, r.parent, r.status === 'active' ? 'نشط الآن' : 'غير نشط'])),
     stats: [
-      { value: fmt(34 + all.length - SEED_COUNT.departments), label: 'إجمالي الأقسام والإدارات', pill: ok('شامل كافة القطاعات'), pillClass: 'is-text', icon: <OrgChartIcon size={24} />, tint: T.blue },
-      { value: '26', label: 'أقسام فرعية تشغيلية', icon: <OrgChartIcon size={24} />, tint: T.blue },
-      { value: '8', label: 'إدارات رئيسية مستقلة', pill: '(HQ) مستوى قيادي أول', pillClass: 'is-green', icon: <IdCardIcon size={24} />, tint: T.blue },
-      { value: '32', label: 'مراكز التكلفة المربوطة', pill: 'متطابق وآني', pillClass: 'is-blue', icon: <ShieldCheckIcon size={24} />, tint: T.mint },
+      { value: fmt(all.length), label: 'إجمالي الأقسام والإدارات', icon: <OrgChartIcon size={24} />, tint: T.blue },
+      { value: '—', label: 'أقسام فرعية تشغيلية', icon: <OrgChartIcon size={24} />, tint: T.blue },
+      { value: '—', label: 'إدارات رئيسية مستقلة', icon: <IdCardIcon size={24} />, tint: T.blue },
+      { value: '—', label: 'مراكز التكلفة المربوطة', icon: <ShieldCheckIcon size={24} />, tint: T.mint },
     ].map((s, i) => (all.length === 0 ? { ...s, value: '00' } : s)),
     empty: { icon: <OrgChartIcon size={64} />, title: 'لا توجد أقسام أو إدارات حتى الآن', text: 'ابدأ بإضافة القسم أو الإدارة الأولى لبناء الهيكل التنظيمي للجهة. يمكنك لاحقًا تفريع الإدارات المساندة وربط مراكز التكلفة لاعتماد مسارات المنافسات والمشتريات آليًا وفق الحوكمة المعتمدة.', btn: 'إضافة أول قسم' },
     secondOpts: [ALL, ...mains], widths: [4, 22, 12, 17, 11, 10, 11, 13],
     cols: [{ h: 'اسم القسم / الإدارة' }, { h: 'الرمز التنظيمي' }, { h: 'القسم الأعلى' }, { h: 'الأقسام التابعة' }, { h: 'الحالة' }, { h: 'آخر تحديث' }],
   };
+  if (isLoading) return <LoadingBlock />;
   return (
     <ListPage cfg={cfg} rows={rows} all={all} {...L} onAdd={() => nav('/master-data/departments/new')}>
       {rows.map((r) => (
         <tr key={r.id} className={L.selected.includes(r.id) ? 'is-sel' : ''} onClick={() => nav('/master-data/departments/' + r.id)}>
           <td className="mcb"><Cbx checked={L.selected.includes(r.id)} onChange={() => toggleSel(L.selected, L.setSelected, r.id)} label="تحديد" size={22} /></td>
           <td><div className="vname"><strong className="mname">{r.name}</strong><small>{r.sub}</small></div></td>
-          <td>{r.code.startsWith('DEPT') ? <span className="mcode mcode--plain">{r.code}</span> : <span className="mcode">{r.code}</span>}</td>
+          <td><span className="mcode">{r.code}</span></td>
           <td className="mtxt">{r.parent}</td>
           <td className={'mtxt' + (kids(r) !== '-' ? ' mblue' : '')}>{kids(r)}</td>
           <td><StatusPill s={r.status} now /></td>
           <td>{dateCell(r)}</td>
-          <td><RowActions onEdit={() => nav(`/master-data/departments/${r.id}/edit`)} onLock={() => toggle('departments', r.id)} onView={() => nav('/master-data/departments/' + r.id)} onDelete={() => remove('departments', r.id)} /></td>
+          <td><RowActions onEdit={() => nav(`/master-data/departments/${r.id}/edit`)} onLock={() => toggleDepartment(r)} onView={() => nav('/master-data/departments/' + r.id)} /></td>
         </tr>
       ))}
     </ListPage>

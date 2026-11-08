@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { isAuthed } from './auth.js';
 import AppLayout from './components/AppLayout.jsx';
 import Placeholder from './components/Placeholder.jsx';
+import { FullScreenLoader } from './components/Spinner.jsx';
+import { PASSWORD_CHANGE_PATH, useCurrentUser } from './hooks/use-auth.js';
 import Login from './pages/Login.jsx';
 import UserLogin from './pages/UserLogin.jsx';
 import ForgotPassword from './pages/ForgotPassword.jsx';
@@ -12,12 +14,9 @@ import Users from './pages/Users.jsx';
 import UserDetail from './pages/UserDetail.jsx';
 import AddUser from './pages/AddUser.jsx';
 import Roles from './pages/Roles.jsx';
-import AddRole from './pages/AddRole.jsx';
 import Vendors from './pages/Vendors.jsx';
 import VendorDetail from './pages/VendorDetail.jsx';
 import VendorForm from './pages/VendorForm.jsx';
-import { RolesProvider } from './rolesStore.jsx';
-import { VendorsProvider } from './vendorsStore.jsx';
 import { MasterProvider } from './masterStore.jsx';
 import MasterHub from './pages/master/MasterHub.jsx';
 import { DepartmentsList, ItemsList, UnitsList, CategoriesList } from './pages/master/MasterList.jsx';
@@ -26,13 +25,15 @@ import { DepartmentForm, ItemForm, UnitForm, CategoryForm } from './pages/master
 import { SettingsHub, SettingsGeneral, SettingsProcurement, SettingsNotifications } from './pages/SettingsPages.jsx';
 
 function RequireAuth({ children }) {
-  return isAuthed() ? children : <Navigate to="/login" replace />;
+  const { user, isLoading } = useCurrentUser();
+  if (!isAuthed()) return <Navigate to="/login" replace />;
+  if (isLoading) return <FullScreenLoader />;
+  if (user?.must_change_password) return <Navigate to={PASSWORD_CHANGE_PATH} replace />;
+  return children;
 }
 
 export default function App() {
   return (
-    <RolesProvider>
-    <VendorsProvider>
     <MasterProvider>
     <Routes>
       {/* Authentication screens (no sidebar) */}
@@ -40,7 +41,7 @@ export default function App() {
       <Route path="/user-login" element={<UserLogin />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/first-login-password" element={<FirstLoginPassword />} />
+      <Route path={PASSWORD_CHANGE_PATH} element={<FirstLoginPassword />} />
 
       {/* Footer pages: no design provided */}
       <Route path="/support" element={<Placeholder standalone />} />
@@ -56,7 +57,7 @@ export default function App() {
         <Route path="/users/:id/permissions" element={<Placeholder />} />
         <Route path="/users/:id/edit" element={<Placeholder />} />
         <Route path="/roles" element={<Roles />} />
-        <Route path="/roles/new" element={<AddRole />} />
+        <Route path="/roles/new" element={<Navigate to="/roles" replace />} />
         <Route path="/roles/:key/edit" element={<Placeholder />} />
         <Route path="/vendors" element={<Vendors />} />
         <Route path="/vendors/new" element={<VendorForm />} />
@@ -89,7 +90,5 @@ export default function App() {
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
     </MasterProvider>
-    </VendorsProvider>
-    </RolesProvider>
   );
 }

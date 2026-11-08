@@ -1,6 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { DASHBOARD_ROWS, ACTIVITY } from '../data.js';
-import { UsersFilters, UsersTable, Pagination, useUserFilters } from '../components/UsersTable.jsx';
+import { UsersFilters, UsersTable, Pagination } from '../components/UsersTable.jsx';
+import { LoadingBlock } from '../components/Spinner.jsx';
+import { useCurrentUser } from '../hooks/use-auth.js';
+import { useDashboardStats, useRecentActivity } from '../hooks/use-dashboard.js';
+import { useUsersList } from '../hooks/use-users.js';
 import {
   IdCardIcon,
   UsersIcon,
@@ -14,7 +17,7 @@ import {
   SmallUserIcon,
 } from '../components/Icons.jsx';
 
-const ROWS = DASHBOARD_ROWS.map((r, i) => ({ ...r, rowKey: 'd' + i }));
+const count = (value) => (value === undefined ? '—' : value.toLocaleString('en-US'));
 
 const ACT_ICON = { users: 'bg-users-blue', shield: 'bg-shield-blue', grid: 'bg-dashboard-blue' };
 
@@ -22,7 +25,7 @@ function StatCard({ badge, badgeTone, icon, value, label, sub, iconTone }) {
   return (
     <div className="dstat">
       <div className="dstat__top">
-        <span className={'dstat__badge dstat__badge--' + badgeTone}>{badge}</span>
+        {badge && <span className={'dstat__badge dstat__badge--' + badgeTone}>{badge}</span>}
         <span className={'dstat__icon has-tile dstat__icon--' + iconTone}>{icon}</span>
       </div>
       <strong>{value}</strong>
@@ -52,13 +55,16 @@ function ActionCard({ tag, tagTone, icon, title, text, children }) {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const f = useUserFilters();
+  const { user, hasPermission } = useCurrentUser();
+  const stats = useDashboardStats();
+  const { activity, isLoading: isActivityLoading } = useRecentActivity();
+  const list = useUsersList({ pageSize: 5 });
   return (
     <div className="dash">
       <div className="page-head">
         <div>
           <div className="dash__hello">
-            <h1 className="page-title">مرحبًا، مدير النظام</h1>
+            <h1 className="page-title">مرحبًا، {user?.name}</h1>
             <span className="live-pill">
               <i />
               <i />
@@ -78,11 +84,11 @@ export default function Dashboard() {
       </div>
 
       <div className="dstats">
-        <StatCard badge="+12 هذا الشهر" badgeTone="blue" iconTone="blue" icon={<img className="tile-img" src="/assets/icons/tile-idcard.png" alt="" />} value="248" label="إجمالي المستخدمين" sub="حساب مسجل وموثوق" />
-        <StatCard badge="حالة سليمة" badgeTone="green" iconTone="green" icon={<img className="tile-img" src="/assets/icons/tile-users-green.png" alt="" />} value="215" label="المستخدمون النشطون" sub="معدل النشاط اليومي 86.7%" />
-        <StatCard badge="يتطلب متابعة" badgeTone="gray" iconTone="gray" icon={<img className="tile-img" src="/assets/icons/bg-userban.png" alt="" />} value="33" label="غير النشطين" sub="18 معلقة · 15 معطلة" />
-        <StatCard badge="محدثة وفق الدليل" badgeTone="blue" iconTone="blue" icon={<img className="tile-img" src="/assets/icons/bg-roles.png" alt="" />} value="12" label="الأدوار والصلاحيات" sub="دور وظيفي · 86 صلاحية" />
-        <StatCard badge="سجل التدقيق نشط" badgeTone="blue" iconTone="blue" icon={<img className="tile-img" src="/assets/icons/bg-monitor.png" alt="" />} value="1,840" label="نشاطات النظام" sub="عملية مسجلة خلال 24 ساعة" />
+        <StatCard iconTone="blue" icon={<img className="tile-img" src="/assets/icons/tile-idcard.png" alt="" />} value={count(stats.total)} label="إجمالي المستخدمين" sub="حساب مسجل" />
+        <StatCard iconTone="green" icon={<img className="tile-img" src="/assets/icons/tile-users-green.png" alt="" />} value={count(stats.active)} label="المستخدمون النشطون" sub="" />
+        <StatCard iconTone="gray" icon={<img className="tile-img" src="/assets/icons/bg-userban.png" alt="" />} value={count(stats.inactive)} label="غير النشطين" sub="" />
+        <StatCard iconTone="blue" icon={<img className="tile-img" src="/assets/icons/bg-roles.png" alt="" />} value={count(stats.roles)} label="الأدوار والصلاحيات" sub={`دور وظيفي · ${count(stats.permissions)} صلاحية`} />
+        <StatCard iconTone="blue" icon={<img className="tile-img" src="/assets/icons/bg-monitor.png" alt="" />} value={count(stats.activityToday)} label="نشاطات النظام" sub="عملية مسجلة اليوم" />
       </div>
 
       <div className="dcols">
@@ -180,10 +186,12 @@ export default function Dashboard() {
             </Link>
           </div>
           <div className="activity">
-            {ACTIVITY.map((a) => {
+            {isActivityLoading && <LoadingBlock />}
+            {!isActivityLoading && activity.length === 0 && <div className="rlist__none">لا توجد نشاطات</div>}
+            {activity.map((a) => {
               const Icon = ACT_ICON[a.icon];
               return (
-                <article className="act-item" key={a.title + a.time}>
+                <article className="act-item" key={a.key}>
                   <span className="act-item__icon has-tile">
                     <img className="tile-img" src={`/assets/icons/${Icon}.png`} alt="" />
                   </span>
@@ -205,11 +213,15 @@ export default function Dashboard() {
         </section>
       </div>
 
-      <UsersFilters f={f} layout="inline" />
-      <div className="paged">
-        <UsersTable rows={ROWS} f={f} />
-        <Pagination total={55} pageSize={5} lastPage={31} />
-      </div>
+      {hasPermission('users.manage') && (
+        <>
+          <UsersFilters f={list.filters} layout="inline" />
+          <div className="paged">
+            <UsersTable rows={list.rows} isLoading={list.isLoading} />
+            <Pagination total={list.total} pageSize={list.pageSize} lastPage={list.lastPage} page={list.page} onPageChange={list.setPage} />
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useRoles } from '../rolesStore.jsx';
+import { useRoles } from '../hooks/use-roles.js';
 import { countAll, countChecked } from '../rolesData.js';
+import { LoadingBlock } from '../components/Spinner.jsx';
 import Cbx from '../components/Cbx.jsx';
 import RoleIcon from '../components/RoleIcon.jsx';
 import {
@@ -169,14 +170,15 @@ function PermItem({ item, onToggle }) {
   );
 }
 
-function RolePanel({ role, onSave }) {
+function RolePanel({ role, onSave, isSaving }) {
   const [draft, setDraft] = useState(role.groups);
   useEffect(() => setDraft(role.groups), [role.id, role.groups]);
 
   const total = countAll(draft);
   const on = countChecked(draft);
+  const locked = role.readOnly;
   const toggle = (gi, ii) =>
-    setDraft((d) =>
+    !locked && setDraft((d) =>
       d.map((g, i) => (i !== gi ? g : { ...g, items: g.items.map((it, j) => (j === ii ? { ...it, checked: !it.checked } : it)) }))
     );
   const setAll = () => {
@@ -198,9 +200,11 @@ function RolePanel({ role, onSave }) {
           <p>{role.panelSub || 'معاينة وتعديل مصفوفة الصلاحيات الممنوحة'}</p>
         </div>
         <div className="rpanel__tools">
-          <button type="button" className="rpanel__link" onClick={setAll}>
-            تحديد الكل
-          </button>
+          {!locked && (
+            <button type="button" className="rpanel__link" onClick={setAll}>
+              تحديد الكل
+            </button>
+          )}
           <button type="button" className="rpanel__reset" aria-label="تحديث" onClick={() => setDraft(role.groups)}>
             <RefreshIcon size={20} />
           </button>
@@ -231,14 +235,16 @@ function RolePanel({ role, onSave }) {
         ))}
       </div>
 
-      <footer className="rpanel__foot">
-        <button type="button" className="btn-outline" onClick={() => setDraft(role.groups)}>
-          إلغاء التغييرات
-        </button>
-        <button type="button" className="btn-primary" onClick={() => onSave(role.id, draft)}>
-          حفظ مصفوفة الصلاحيات
-        </button>
-      </footer>
+      {!locked && (
+        <footer className="rpanel__foot">
+          <button type="button" className="btn-outline" onClick={() => setDraft(role.groups)}>
+            إلغاء التغييرات
+          </button>
+          <button type="button" className="btn-primary" disabled={isSaving} onClick={() => onSave(role.id, draft)}>
+            حفظ مصفوفة الصلاحيات
+          </button>
+        </footer>
+      )}
     </aside>
   );
 }
@@ -251,8 +257,7 @@ const STATUS_OPTS = [
 ];
 
 export default function Roles() {
-  const { roles, saveGroups } = useRoles();
-  const navigate = useNavigate();
+  const { roles, permissionsCount, isLoading, savePermissions, isSaving } = useRoles();
   const location = useLocation();
   const [q, setQ] = useState('');
   const [status, setStatus] = useState('active');
@@ -272,11 +277,9 @@ export default function Roles() {
     setStatus('active');
     setType('');
   };
-  const created = roles.filter((r) => r.custom);
-  const createdActive = created.filter((r) => r.status === 'active').length;
-  // the design says "6 of 8": two roles are not part of the screens we were given
-  const hiddenInDesign = 2;
-  const totalDefined = roles.length + hiddenInDesign;
+  const totalDefined = roles.length;
+  const assignedUsers = roles.reduce((sum, r) => sum + r.users, 0);
+  const averagePerms = roles.length ? Math.round(roles.reduce((sum, r) => sum + r.perms, 0) / roles.length) : 0;
 
   return (
     <div className="roles-page">
@@ -285,48 +288,40 @@ export default function Roles() {
           <h1 className="page-title">الأدوار والصلاحيات</h1>
           <p className="page-subtitle">إدارة أدوار المستخدمين والتحكم في مصفوفة صلاحيات الوصول وفق معايير الحوكمة</p>
         </div>
-        <div className="page-head__actions">
-          <button type="button" className="btn-primary" onClick={() => navigate('/roles/new')}>
-            إضافة دور جديد
-          </button>
-        </div>
       </div>
 
       <div className="ustats">
         <Stat
           icon={<FingerprintIcon size={26} />}
           tint={{ bg: '#e8f6ff', fg: '#0b2a4a' }}
-          value={8 + createdActive}
+          value={roles.length}
           unit="أدوار مفعلة"
           label="إجمالي الادوار المعرفة"
-          sub={`6 قياسية . ${2 + created.length} أدوار مخصصة للجان`}
-          subClass="is-green"
+          sub=""
         />
         <Stat
           icon={<UsersIcon size={24} />}
           tint={{ bg: '#eefff8', fg: '#0a5c36' }}
-          value="148"
+          value={assignedUsers}
           unit="مستخدم موثوق"
           label="اجمالي المستخدمين المعينين"
-          sub="(مربوطين بالهوية الوطنية الموحدة (نفاذ"
-          subClass="is-green"
+          sub=""
         />
         <Stat
           icon={<ShieldIcon size={24} />}
           tint={{ bg: '#e8f6ff', fg: '#0b2a4a' }}
-          value="21"
+          value={averagePerms}
           unit="صلاحية إجرائية"
           label="متوسط الصلاحيات لكل دور"
-          sub="موزعة عبر 5 وحدات نظام مركزية"
+          sub={`من أصل ${permissionsCount} صلاحية`}
         />
         <Stat
           icon={<CheckBoxIcon size={24} />}
           tint={{ bg: '#eefff8', fg: '#0a5c36' }}
-          value="100%"
-          unit="متوافق بالكامل"
+          value="—"
+          unit=""
           label="المقفلة وغير النشطة"
-          sub="صفر تعارض صلاحيات"
-          subClass="is-green"
+          sub=""
         />
       </div>
 
@@ -373,11 +368,12 @@ export default function Roles() {
             {list.map((r) => (
               <RoleCard key={r.id} role={r} selected={r.id === selectedId} onSelect={() => setSelectedId(r.id)} />
             ))}
-            {list.length === 0 && <div className="rlist__none">لا توجد نتائج</div>}
+            {isLoading && <LoadingBlock />}
+            {!isLoading && list.length === 0 && <div className="rlist__none">لا توجد نتائج</div>}
           </div>
         </section>
 
-        {selected ? <RolePanel role={selected} onSave={saveGroups} /> : <EmptyPanel />}
+        {selected ? <RolePanel role={selected} onSave={savePermissions} isSaving={isSaving} /> : <EmptyPanel />}
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ import {
   SearchIcon, BellIcon, GlobeIcon, ChevronLeftIcon, ShieldLockIcon, UserFilledIcon,
 } from './Icons.jsx';
 import * as N from './NavIcons.jsx';
-import { signOut } from '../auth.js';
+import { useCurrentUser, useLogout } from '../hooks/use-auth.js';
 
 const ICONS = {
   grid: [GridIcon, N.NavGridFill],
@@ -30,10 +30,10 @@ function crumbsFor(pathname, M) {
     if (!m) return [...base, BD];
     const [, kind, id, edit] = m;
     const isNew = id === 'new';
-    const rec = id && !isNew ? M[kind].find((x) => x.id === id) : null;
+    const rec = id && !isNew ? M[kind]?.find((x) => x.id === id) : null;
     const nm = rec ? rec.name : '';
     const L = { departments: '/master-data/departments', items: '/master-data/items', units: '/master-data/units', categories: '/master-data/categories' }[kind];
-    if (kind === 'departments') return [...base, BD, ...(!id ? [{ label: 'الأقسام والإدارات', to: L }] : [{ label: isNew ? 'إضافة قسم أو إدارة جديدة' : edit ? 'تعديل قسم أو إدارة جديدة' : nm, to: pathname }])];
+    if (kind === 'departments') return [...base, BD, ...(!id ? [{ label: 'الأقسام والإدارات', to: L }] : [{ label: isNew ? 'إضافة قسم أو إدارة جديدة' : edit ? 'تعديل قسم أو إدارة جديدة' : 'تفاصيل القسم', to: pathname }])];
     if (kind === 'items') return [...base, BD, ...(!id ? [{ label: 'الأصناف', to: L }] : [{ label: 'الأصناف', to: L }, { label: edit ? 'تعديل بيانات عنصر' : 'إضافة صنف جديد', to: pathname }])];
     if (kind === 'units') return [...base, BD, { label: 'الأصناف', to: '/master-data/items' }, { label: 'وحدات قياس', to: L }, ...(!id ? [] : [{ label: isNew || edit ? 'إضافة وحدة قياس جديدة' : nm, to: pathname }])];
     return [...base, BD, ...(!id ? [{ label: 'التصنيفات', to: L }] : isNew || edit ? [{ label: 'الأصناف', to: '/master-data/items' }, { label: 'إضافة صنف جديد', to: pathname }] : [{ label: 'التصنيفات', to: L }, { label: nm, to: pathname }])];
@@ -56,6 +56,9 @@ function crumbsFor(pathname, M) {
 
 function Sidebar({ open, onClose }) {
   const { pathname } = useLocation();
+  const { user, hasPermission } = useCurrentUser();
+  const { logout } = useLogout();
+  const navItems = NAV_ITEMS.filter((item) => !user || !item.permission || hasPermission(item.permission));
   return (
     <aside className={'sidebar' + (open ? ' is-open' : '')} onClick={(e) => e.target.closest('a') && onClose()}>
       <div className="sidebar__scroll">
@@ -65,7 +68,7 @@ function Sidebar({ open, onClose }) {
         </Link>
         <div className="sidebar__label">القوائم التشغيلية</div>
         <nav className="sidebar__nav">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const active = item.to === '/' ? pathname === '/' : pathname === item.to || pathname.startsWith(item.to + '/');
             const Icon = ICONS[item.icon][active ? 1 : 0];
             return (
@@ -91,10 +94,10 @@ function Sidebar({ open, onClose }) {
         <div className="sidebar__profile">
           <UserFilledIcon size={28} className="sidebar__avatar" />
           <div>
-            <strong>د. محمد كسبة</strong>
-            <small>مدير النظام العام</small>
+            <strong>{user?.name}</strong>
+            <small>{user?.roles?.[0]?.label}</small>
           </div>
-          <button type="button" className="sidebar__chev" aria-label="تسجيل الخروج" title="تسجيل الخروج" onClick={() => { signOut(); window.location.assign("/login"); }}>
+          <button type="button" className="sidebar__chev" aria-label="تسجيل الخروج" title="تسجيل الخروج" onClick={logout}>
             <ChevronLeftIcon size={18} />
           </button>
         </div>

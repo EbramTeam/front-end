@@ -88,7 +88,7 @@ export function RowActions({ onEdit, onLock, onView, onDelete }) {
           <div className="vkebab__menu">
             <button type="button" onClick={() => { setOpen(false); onView(); }}>عرض التفاصيل</button>
             <button type="button" onClick={() => { setOpen(false); onEdit(); }}>تعديل</button>
-            <button type="button" onClick={() => { setOpen(false); onDelete(); }}>حذف</button>
+            {onDelete && <button type="button" onClick={() => { setOpen(false); onDelete(); }}>حذف</button>}
           </div>
         )}
       </span>

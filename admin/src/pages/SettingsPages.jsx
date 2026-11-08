@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { settings, NOTIF_DEFAULT } from '../settingsStore.js';
 import { setLanguage } from '../i18n/translate.js';
+import { useOrganization } from '../hooks/use-dashboard.js';
 import { PageHead } from './master/Bits.jsx';
 import Cbx from '../components/Cbx.jsx';
 import { SettingsIcon, BellIcon, ShieldIcon, ShieldCheckIcon, UploadIcon, TrashIcon, BanIcon, CalendarIcon, ClockHistoryIcon, InfoCircleIcon, KeyLockIcon, LockIcon, FingerprintIcon, BuildingIcon, SmallUserIcon, DocIcon, GavelIcon, CertIcon, WarnIcon } from '../components/Icons.jsx';
@@ -30,6 +31,7 @@ function SCard({ off, tag, icon, title, text, rows, link, linkTo, side, cls = ''
 export function SettingsHub() {
   const nav = useNavigate();
   const [prod, setProd] = useState(settings.prod);
+  const organization = useOrganization();
   return (
     <div className="shub">
       <PageHead title="الإعدادات" sub="إدارة إعدادات النظام والخيارات التي تتحكم في طريقة عمل المنصة، مسارات الاعتمادات، وقنوات الاتصال السيادية." tag={<span className="stag">إصدار النظام السيادي 2.4<i /></span>} inline>
@@ -40,7 +42,7 @@ export function SettingsHub() {
         </label>
       </PageHead>
       <div className="shub__grid">
-        <SCard tag="نشط ومعتمد" icon={<SettingsIcon size={26} />} title="الإعدادات العامة" text="إدارة المعلومات والتفضيلات العامة للجهة والنظام، وتثبيت المحددات الهيكلية للمنظمة." rows={[['هوية وسجل الجهة:', 'جامعة الأزهر'], ['العملة المعيارية:', 'ريال سعودي (SAR)'], ['التقويم والمنطقة:', 'أم القرى (UTC+03:00)']]} link="عرض الإعدادات العامة" linkTo="/settings/general" side="4 أقسام فرعية" />
+        <SCard tag="نشط ومعتمد" icon={<SettingsIcon size={26} />} title="الإعدادات العامة" text="إدارة المعلومات والتفضيلات العامة للجهة والنظام، وتثبيت المحددات الهيكلية للمنظمة." rows={[['هوية وسجل الجهة:', organization?.name ?? '—'], ['العملة المعيارية:', organization?.currency ?? '—'], ['التقويم والمنطقة:', 'أم القرى (UTC+03:00)']]} link="عرض الإعدادات العامة" linkTo="/settings/general" side="4 أقسام فرعية" />
         <SCard tag="مسارات مفعلة" icon={<WorkflowIcon size={26} />} title="المشتريات وسير العمل" text="مراجعة إعدادات المشتريات ومراحل الطلبات وسلاسل الاعتماد وتوزيع الصلاحيات المالية." rows={[['قواعد الشراء وسقوفها:', '3 مستويات تسعيرية'], ['سلاسل الموافقات:', 'مباشر / لجنة تدقيق'], ['اعتماد أوامر الصرف:', 'الزامي للمفوضين', true]]} link="إدارة سير المشتريات والعمل" linkTo="/settings/procurement" side="تبويبين رئيسيين" />
         <SCard tag="قنوات الاتصال جاهزة" icon={<BellIcon size={26} />} title="الإشعارات" text="إدارة تفضيلات الإشعارات المرتبطة بإجراءات النظام، تنبيهات الترسية وسجلات التدقيق الفوري." rows={[['الإشعارات البريدية:', 'خادم SMTP المؤسسي'], ['تنبيهات أوامر الشراء:', 'إشعار فوري عند التحديث'], ['تنبيهات التدقيق الرقابي:', 'مفعلة للمراقبة المالية']]} link="تخصيص قنوات وتنبيهات النظام" linkTo="/settings/notifications" side="3 قنوات نشطة" />
         <SCard off cls="scard--soon" tag="قريباً - غير متاح في الإصدار الحالي (MVP)" icon={<ShieldIcon size={26} />} title="النظام والأمان" text="إعدادات الأمان المتقدمة وسياسات الوصول الموحد والتكامل التقني والربط الشبكي الحكومي." rows={[['المصادقة الثنائية وسياسة IAM:', 'مجدول للتفعيل المستقبلي'], ['الربط مع واجهات (API) السيادي:', 'قيد التطوير والتكامل'], ['التوافق المؤسسي الوطني:', 'بانتظار الاعتماد التنظيمي']]} link="قيد التطوير والاعتماد التنظيمي" side="مرحلة قادمة" />
@@ -56,6 +58,7 @@ export function SettingsHub() {
 
 // ---------- الإعدادات العامة ----------
 export function SettingsGeneral() {
+  const organization = useOrganization();
   const [logo, setLogo] = useState(settings.logo ? 'default' : '');
   const [lang, setLang] = useState(document.documentElement.lang === 'en' ? 'English' : 'العربية (الافتراضية الموحدة)');
   const file = useRef(null);
@@ -81,7 +84,7 @@ export function SettingsGeneral() {
           <div className="sf">
             <h3>اسم الجهة</h3>
             <p>الاسم القانوني كما يظهر في المخاطبات الرسمية، دفاتر الشروط، وإشعارات الترسية.</p>
-            <div className="sname"><input readOnly value="شركة إبرام القابضة" aria-label="اسم الجهة" /><ShieldCheckIcon size={20} /></div>
+            <div className="sname"><input readOnly value={organization?.name ?? ''} aria-label="اسم الجهة" /><ShieldCheckIcon size={20} /></div>
             <small>يُشترط مطابقة الاسم لما هو مسجل في السجل التجاري الموحد للمشتريات.</small>
           </div>
           <div className="sf">
