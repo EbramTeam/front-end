@@ -1,13 +1,14 @@
-import { signIn } from '../auth.js';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import AuthLayout, { AuthHero, Field, Check } from '../components/AuthLayout.jsx';
 import { ShieldLockIcon } from '../components/Icons.jsx';
+import { Spinner } from '../components/Spinner.jsx';
+import { useLogin } from '../hooks/use-auth.js';
 
 // Admin portal login (design: "Login", Figma node 713:307)
 export default function Login() {
-  const navigate = useNavigate();
-  const [username, setUsername] = useState('');
+  const { login, isSubmitting } = useLogin();
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -15,7 +16,7 @@ export default function Login() {
   function onSubmit(e) {
     e.preventDefault();
     setSubmitted(true);
-    if (username.trim() && password.trim()) { signIn(); navigate('/'); }
+    if (email.trim() && password.trim()) login({ email: email.trim(), password, remember });
   }
 
   return (
@@ -30,13 +31,14 @@ export default function Login() {
         <form className="auth-card" onSubmit={onSubmit} noValidate>
           <div className="auth-fields auth-fields--login">
             <Field
-              name="username"
-              label="إسم المستخدم"
+              name="email"
+              label="البريد الإلكتروني"
               required
-              placeholder="ادخل إسم المستخدم"
-              value={username}
-              onChange={setUsername}
-              invalid={submitted && !username.trim()}
+              type="email"
+              placeholder="ادخل البريد الإلكتروني"
+              value={email}
+              onChange={setEmail}
+              invalid={submitted && !email.trim()}
             />
             <Field
               name="password"
@@ -57,7 +59,8 @@ export default function Login() {
               هل نسيت كلمة المرور؟
             </Link>
           </div>
-          <button type="submit" className="btn-primary btn-primary--lg">
+          <button type="submit" className="btn-primary btn-primary--lg" disabled={isSubmitting}>
+            {isSubmitting && <Spinner size="sm" tone="onPrimary" />}
             تسجيل الدخول
           </button>
           <div className="security-notice">

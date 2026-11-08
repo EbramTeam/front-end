@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useMaster } from '../../masterStore.jsx';
+import { useDepartment, useSaveDepartment } from '../../hooks/use-departments.js';
+import { LoadingBlock } from '../../components/Spinner.jsx';
 import { COST_CENTERS, GRADE_OPTION, UNIT_GROUPS } from '../../masterData.js';
 import { PageHead } from './Bits.jsx';
 import Cbx from '../../components/Cbx.jsx';
@@ -47,10 +49,10 @@ const Card = ({ icon, title, sub, children }) => (
     {children}
   </section>
 );
-const Foot = ({ onCancel }) => (
+const Foot = ({ onCancel, disabled }) => (
   <div className="mfoot">
     <button type="button" className="btn-outline" onClick={onCancel}>إلغاء</button>
-    <button type="submit" className="btn-primary">حفظ</button>
+    <button type="submit" className="btn-primary" disabled={disabled}>حفظ</button>
   </div>
 );
 function useForm(init) {
@@ -70,21 +72,21 @@ function useForm(init) {
 
 // ---------- الأقسام ----------
 export function DepartmentForm({ edit }) {
-  const nav = useNavigate();
   const { id } = useParams();
-  const [sp] = useSearchParams();
-  const { departments, add, update, DEPT_MAIN } = useMaster();
-  const cur = edit ? departments.find((d) => d.id === id) : null;
-  const par = !edit && sp.get('parent') ? departments.find((d) => d.id === sp.get('parent')) : null;
-  const { f, set, bad, check } = useForm(cur ? { name: cur.name, code: cur.code, cc: cur.cc || '', level: cur.level, desc: cur.desc || '' } : { name: '', code: '', cc: '', level: par ? 'sub' : '', desc: '' });
-  if (edit && !cur) return <Navigate to="/master-data/departments" replace />;
+  const { department, isLoading } = useDepartment(id);
+  if (!edit) return <DepartmentFormBody />;
+  if (isLoading) return <LoadingBlock />;
+  if (!department) return <Navigate to="/master-data/departments" replace />;
+  return <DepartmentFormBody key={id} cur={department} />;
+}
+
+function DepartmentFormBody({ cur }) {
+  const edit = Boolean(cur);
+  const nav = useNavigate();
+  const { saveDepartment, isSaving } = useSaveDepartment(cur, (savedId) => nav('/master-data/departments/' + savedId));
+  const { f, set, bad, check } = useForm({ name: cur?.name ?? '', code: cur?.code ?? '', cc: '', level: '', desc: '' });
   const submit = (e) => {
-    if (!check(e, ['name', 'code', 'cc', 'level', 'desc'])) return;
-    let parent = DEPT_MAIN;
-    if (f.level === 'sub') parent = par?.name || (cur && cur.parent !== DEPT_MAIN ? cur.parent : null) || departments.find((d) => d.level === 'main')?.name;
-    const rec = { name: f.name.trim(), code: f.code.trim(), cc: f.cc, level: f.level, parent, desc: f.desc.trim(), scope: 'نطاق المهام: ' + f.desc.trim() };
-    if (edit) { update('departments', cur.id, rec); nav('/master-data/departments/' + cur.id); }
-    else { const nid = add('departments', { ...rec, sub: '', status: 'active', tenders: 0, staff: 0 }); nav('/master-data/departments/' + nid); }
+    if (check(e, ['name', 'code'])) saveDepartment(f);
   };
   return (
     <form className="vform mform" onSubmit={submit} noValidate>
@@ -93,9 +95,9 @@ export function DepartmentForm({ edit }) {
         <Field label="اسم القسم أو الإدارة" req bad={bad('name')}><Input v={f.name} set={set('name')} ph="مثال: الإدارة العامة للتحول الرقمي أو قسم الدعم الفني" /></Field>
         <div className="vf2">
           <Field label="رمز القسم المرجعي (Code)" req bad={bad('code')}><Input v={f.code} set={set('code')} ph="مثال: SEC-SUP-02 أو DEPT-DIG-05" /></Field>
-          <Field label="مركز التكلفة المالي المرتبط" req bad={bad('cc')}><Select v={f.cc} set={set('cc')} ph="اختر التصنيف الرئيسي للصنف..." opts={COST_CENTERS} /></Field>
+          <Field label="مركز التكلفة المالي المرتبط"><Select v={f.cc} set={set('cc')} ph="اختر التصنيف الرئيسي للصنف..." opts={COST_CENTERS} /></Field>
         </div>
-        <Field label="نوع الوحدة التنظيمية (Department Level)" req bad={bad('level')}>
+        <Field label="نوع الوحدة التنظيمية (Department Level)">
           <div className="mchoices">
             <Choice on={f.level === 'main'} set={() => set('level')('main')} title="إدارة رئيسية مستقلة" sub="مستوى أول ترتبط مباشرة بالرئيس التنفيذي أو وكيل الوزارة." />
             <Choice on={f.level === 'sub'} set={() => set('level')('sub')} title="قسم فرعي تابع لإدارة رئيسية" sub="مستوى ثان يتطلب تحديد الإدارة المشرفة لتدفق التواقيع." />
@@ -103,9 +105,9 @@ export function DepartmentForm({ edit }) {
         </Field>
       </Card>
       <Card icon={<CertIcon size={22} />} title="التوصيف والمسؤوليات" sub="نطاق عمل القسم ومسؤولياته في منظومة طلبات الشراء والمنافسات">
-        <Field label="وصف القسم واختصاصاته" req bad={bad('desc')}><Area v={f.desc} set={set('desc')} ph="اكتب نبذة موجزة عن مهام القسم ومسؤولياته في تدقيق واعتماد طلبات المشتريات وفحص العروض الفنية..." /></Field>
+        <Field label="وصف القسم واختصاصاته"><Area v={f.desc} set={set('desc')} ph="اكتب نبذة موجزة عن مهام القسم ومسؤولياته في تدقيق واعتماد طلبات المشتريات وفحص العروض الفنية..." /></Field>
       </Card>
-      <Foot onCancel={() => nav(edit ? '/master-data/departments/' + cur.id : '/master-data/departments')} />
+      <Foot disabled={isSaving} onCancel={() => nav(edit ? '/master-data/departments/' + cur.id : '/master-data/departments')} />
     </form>
   );
 }

@@ -2,7 +2,8 @@ import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check } from '../components/AuthLayout.jsx';
 import { evaluate } from '../components/PasswordRules.jsx';
-import { DEPTS_FILTER, DETAIL_USER_ID } from '../data.js';
+import { useCreateUser, useUserFilterOptions } from '../hooks/use-users.js';
+import TemporaryPasswordDialog from '../components/TemporaryPasswordDialog.jsx';
 import {
   IdCardIcon,
   ClipboardUserIcon,
@@ -36,62 +37,6 @@ const STEPS = [
   { n: 4, title: 'المراجعة والاعتماد', sub: 'التحقق والتوقيع الرقمي', icon: ReportIcon },
 ];
 
-const ROLE_OPTIONS = [
-  {
-    key: 'req',
-    ar: 'الجهة الطالبة',
-    en: 'Requesting Entity',
-    text: 'تقديم طلبات الشراء، متابعة احتياجات القسم، وتأكيد استلام وتسلّم المواد والخدمات الميدانية.',
-    perms: 8,
-    permsLabel: '8 صلاحيات تنفيذية',
-    tag: 'نطاق القسم',
-  },
-  {
-    key: 'mgr',
-    ar: 'مدير القسم',
-    en: 'Department Manager',
-    text: 'اعتماد طلبات الشراء المبدئية للقسم، مراجعة المبررات الفنية والمالية، وإحالة الاحتياجات لإدارة المشتريات.',
-    perms: 14,
-    permsLabel: '14 صلاحية اعتماد',
-    tag: 'اشراف فرعي',
-  },
-  {
-    key: 'fin',
-    ar: 'المالية / الموازنة',
-    en: 'Finance & Budgeting',
-    text: 'التحقق من توفر بنود الميزانية، حجز الارتباط المالي المسبق، ومطابقة أوامر الصرف والفواتير المستحقات.',
-    perms: 18,
-    permsLabel: '18 صلاحية مالية',
-    tag: 'تدقيق مالي',
-  },
-  {
-    key: 'proc',
-    ar: 'قسم المشتريات',
-    en: 'Procurement Department',
-    text: 'إعداد كراسات الشروط، طرح المنافسات والممارسات، التواصل مع الموردين، وإصدار أوامر الشراء الرسمية.',
-    perms: 32,
-    permsLabel: '32 صلاحية مشتريات',
-    tag: 'عقود كاملة',
-  },
-  {
-    key: 'tender',
-    ar: 'لجنة فتح العطاءات',
-    en: 'Tender Opening Committee',
-    text: 'فتح المظاريف والعروض الفنية والمالية في المواعيد المحددة نظاماً، وتحرير المحاضر وتوثيق الضمانات.',
-    perms: 18,
-    permsLabel: '18 صلاحية مالية',
-    tag: 'محاضر لجان',
-  },
-  {
-    key: 'sys',
-    ar: 'مدير النظام',
-    en: 'System Administrator',
-    text: 'إدارة الحسابات، ضبط الإعدادات العامة للمنظومة، إسناد الصلاحيات، والاطلاع على سجلات التدقيق الرقابي.',
-    perms: 32,
-    permsLabel: '32 صلاحية مشتريات',
-    tag: 'تحكم كامل',
-  },
-];
 const UNITS_PER_ROLE = 10; // assumption: the design shows 20 units for 2 selected roles
 
 const SUB_UNITS = ['المركز الرئيسي', 'لجنة فتح المظاريف', 'وحدة الفحص المحاسبي'];
@@ -188,11 +133,14 @@ function SelectField({ label, value, onChange, placeholder, options }) {
         <ChevronDownIcon size={18} className="winput__chev" />
         <select value={value} onChange={(e) => onChange(e.target.value)}>
           <option value="">{placeholder}</option>
-          {options.map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
-          ))}
+          {options.map((o) => {
+            const { value: optionValue, label: optionLabel } = typeof o === 'string' ? { value: o, label: o } : o;
+            return (
+              <option key={optionValue} value={optionValue}>
+                {optionLabel}
+              </option>
+            );
+          })}
         </select>
       </div>
     </div>
@@ -215,7 +163,7 @@ function HeadBar({ dot, title, sub, children }) {
 }
 
 /* ---------- step 1 ---------- */
-function Step1({ d, set, showErrors }) {
+function Step1({ d, set, showErrors, deptOpts }) {
   const filled = [d.name, d.empId, d.email, d.phone, d.dept, d.unit, d.title, d.joined].filter((v) => v && v.trim()).length;
   const pct = Math.round((filled / 8) * 100);
   return (
@@ -236,15 +184,13 @@ function Step1({ d, set, showErrors }) {
       </HeadBar>
       <div className="wgrid">
         <TextField label="ادخل اسم المستخدم كامل" req value={d.name} onChange={(v) => set('name', v)} placeholder="د. حسام بن عبدالعزيز السويلم" invalid={showErrors && !d.name.trim()} />
-        <TextField label="ادخل الرقم الوظيفي" req tight value={d.empId} onChange={(v) => set('empId', v)} placeholder="EMP-09842" invalid={showErrors && !d.empId.trim()} />
-        <TextField label="ادخل البريد الإلكتروني الرسمي" req value={d.email} onChange={(v) => set('email', v)} placeholder="د. حسام بن عبدالعزيز السويلم" invalid={showErrors && !d.email.trim()} />
+        <TextField label="ادخل الرقم الوظيفي" value={d.empId} onChange={(v) => set('empId', v)} placeholder="EMP-09842" />
+        <TextField label="ادخل البريد الإلكتروني الرسمي" req value={d.email} onChange={(v) => set('email', v)} placeholder="name@example.com" invalid={showErrors && !d.email.trim()} />
         <TextField
           label="رقم الهاتف المحمول"
-          req
           value={d.phone}
           onChange={(v) => set('phone', v)}
           placeholder="059"
-          invalid={showErrors && !d.phone.trim()}
           left={
             <span className="phone-code">
               <svg className="flag" viewBox="0 0 24 16" width="24" height="16" aria-hidden="true">
@@ -257,9 +203,9 @@ function Step1({ d, set, showErrors }) {
             </span>
           }
         />
-        <SelectField label="الإدارة / القسم" value={d.dept} onChange={(v) => set('dept', v)} placeholder="الإدارة" options={DEPTS_FILTER} />
+        <SelectField label="الإدارة / القسم" value={d.dept} onChange={(v) => set('dept', v)} placeholder="الإدارة" options={deptOpts} />
         <SelectField label="الوحدة / القسم الفرعي" value={d.unit} onChange={(v) => set('unit', v)} placeholder="الإدارة" options={SUB_UNITS} />
-        <TextField label="المسمى الوظيفي الداخلي" req value={d.title} onChange={(v) => set('title', v)} placeholder="الإدارة العامة للمنافسات والعقود" invalid={showErrors && !d.title.trim()} />
+        <TextField label="المسمى الوظيفي الداخلي" value={d.title} onChange={(v) => set('title', v)} placeholder="الإدارة العامة للمنافسات والعقود" />
         <DateField label="ادخل التاريخ الإنضمام" value={d.joined} onChange={(v) => set('joined', v)} placeholder="الأربعاء . 21 اكتوبر" />
       </div>
       <div className="readybar">
@@ -292,9 +238,8 @@ function Step1({ d, set, showErrors }) {
 }
 
 /* ---------- step 2 ---------- */
-function Step2({ d, set, showErrors }) {
+function Step2({ d, set }) {
   const rules = evaluate(d.password, d.confirm);
-  const pwOk = rules.length && rules.upper && rules.digit && rules.special;
   const score = [rules.length, rules.upper, rules.digit, rules.special].filter(Boolean).length;
   const strengthLabel = ['—', 'ضعيف', 'متوسط', 'قوي', 'قوي جدا (مستوفية)'][score];
   return (
@@ -313,10 +258,7 @@ function Step2({ d, set, showErrors }) {
       </div>
 
       <div className="wfield wfield--wide">
-        <label>
-          <span className="field__req">*</span>
-          اسم المستخدم بالمنظومة (Username)
-        </label>
+        <label>اسم المستخدم بالمنظومة (Username)</label>
         <div className="winput">
           <input value={d.username} onChange={(e) => set('username', e.target.value)} placeholder="s.otaibi" />
         </div>
@@ -333,7 +275,7 @@ function Step2({ d, set, showErrors }) {
 
       <div className="pwrow">
         <div className="pwrow__field">
-          <TextField label="كلمة المرور الجديدة" req tight value={d.password} onChange={(v) => set('password', v)} placeholder="ادخل كلمة المرور" invalid={showErrors && !pwOk} />
+          <TextField label="كلمة المرور الجديدة" value={d.password} onChange={(v) => set('password', v)} placeholder="ادخل كلمة المرور" />
           <div className="meter">
             <div className="meter__top">
               <span>مستوى تعقيد وأمان كلمة المرور</span>
@@ -357,7 +299,7 @@ function Step2({ d, set, showErrors }) {
         </div>
       </div>
 
-      <TextField label="تأكيد كلمة المرور" req value={d.confirm} onChange={(v) => set('confirm', v)} placeholder="ادخل كلمة المرور" invalid={showErrors && !rules.match} />
+      <TextField label="تأكيد كلمة المرور" value={d.confirm} onChange={(v) => set('confirm', v)} placeholder="ادخل كلمة المرور" />
       <div className="match-bar match-bar--wiz">
         <Check checked={rules.match} readOnly>كلمتا المرور متطابقتان تماماً وجاهزتان للاعتماد.</Check>
       </div>
@@ -378,7 +320,7 @@ function Step2({ d, set, showErrors }) {
               إرسال رابط التفعيل وبيانات الدخول إلى البريد الحكومي المعتمد
               <span className="tag tag--secret">سري وآمن</span>
             </strong>
-            <small dir="ltr">s.otaibi@procurement.gov.sa</small>
+            <small dir="ltr">{d.email}</small>
           </span>
         </label>
       </div>
@@ -387,8 +329,8 @@ function Step2({ d, set, showErrors }) {
 }
 
 /* ---------- step 3 ---------- */
-function Step3({ d, set }) {
-  const selected = ROLE_OPTIONS.filter((r) => d.roles.includes(r.key));
+function Step3({ d, set, roleOptions, showErrors }) {
+  const selected = roleOptions.filter((r) => d.roles.includes(r.key));
   const n = selected.length;
   const perms = selected.reduce((a, r) => a + r.perms, 0);
   const toggle = (k) => set('roles', d.roles.includes(k) ? d.roles.filter((x) => x !== k) : [...d.roles, k]);
@@ -414,11 +356,12 @@ function Step3({ d, set }) {
             </h3>
             <span className="rolepanel__count">
               <i />
-              محدد حالياً: <b>{n}</b> من 6
+              محدد حالياً: <b>{n}</b> من {roleOptions.length}
             </span>
           </div>
+          {showErrors && n === 0 && <p className="field__req">اختر دوراً واحداً على الأقل</p>}
           <div className="rolegrid">
-            {ROLE_OPTIONS.map((r) => {
+            {roleOptions.map((r) => {
               const on = d.roles.includes(r.key);
               return (
                 <button type="button" key={r.key} className={'rolecard' + (on ? ' is-on' : '')} onClick={() => toggle(r.key)} aria-pressed={on}>
@@ -555,56 +498,34 @@ function RTile({ label, children, extra, wide }) {
   );
 }
 
-function Step4({ d, set, goTo, showError }) {
-  const picked = ROLE_OPTIONS.filter((r) => d.roles.includes(r.key));
-  const shown = picked.length ? picked : ROLE_OPTIONS.filter((r) => r.key === 'proc' || r.key === 'req');
+function Step4({ d, set, goTo, showError, roleOptions, deptOpts }) {
+  const shown = roleOptions.filter((r) => d.roles.includes(r.key));
+  const deptLabel = deptOpts.find((o) => o.value === d.dept)?.label ?? '—';
   const perms = shown.reduce((a, r) => a + r.perms, 0);
   return (
     <div className="review">
       <Section icon={<IdCardIcon size={22} />} title="1. المعلومات الأساسية" sub="الهوية المؤسسية والبيانات المعتمدة للموظف" onEdit={() => goTo(1)}>
         <div className="rgrid rgrid--3">
-          <RTile label="الاسم الكامل">د. حسام بن عبدالعزيز السويلم</RTile>
-          <RTile label="الرقم الوظيفي" extra={<span className="tag tag--hr">مفعل في HR</span>}>
-            <span className="pill pill--id" dir="ltr">EMP-04821</span>
+          <RTile label="الاسم الكامل">{d.name || '—'}</RTile>
+          <RTile label="الرقم الوظيفي">{d.empId || '—'}</RTile>
+          <RTile label="البريد الإلكتروني الحكومي">
+            <span dir="ltr">{d.email || '—'}</span>
           </RTile>
-          <RTile label="البريد الإلكتروني الحكومي" extra={<CopyIcon size={16} />}>
-            <span dir="ltr">h.suwailem@procure.gov.sa</span>
-          </RTile>
-          <RTile label="الوحدة التنظيمية الفرعية">وحدة فحص العروض والترسية</RTile>
-          <RTile label="الإدارة / القسم">الإدارة العامة للمنافسات والعقود</RTile>
-          <RTile
-            label="رقم الهاتف المحمول"
-            extra={
-              <span className="tag tag--small">
-                <VerifiedIcon size={11} />
-                موثق نفاذ
-              </span>
-            }
-          >
-            <span dir="ltr">+966 50 123 4567</span>
+          <RTile label="الوحدة التنظيمية الفرعية">{d.unit || '—'}</RTile>
+          <RTile label="الإدارة / القسم">{deptLabel}</RTile>
+          <RTile label="رقم الهاتف المحمول">
+            <span dir="ltr">{d.phone || '—'}</span>
           </RTile>
         </div>
         <RTile label="المسمى الوظيفي المعتمد" wide>
-          أخصائي منافسات أول ومحلل عروض لجان فنية <em className="dotsep">· المرتبة الحادية عشرة</em>
+          {d.title || '—'}
         </RTile>
       </Section>
 
       <Section icon={<ClipboardUserIcon size={22} />} title="2. بيانات الدخول وضوابط الأمان" sub="سياسة النفاذ الوطني ومعايير الأمن السيبراني NCA" onEdit={() => goTo(2)}>
-        <div className="rgrid rgrid--2">
-          <RTile label="اسم المتخدم المعتمد للنظام">
-            <span dir="ltr">h.suwailem</span>
-          </RTile>
-          <RTile label="كلمة المرور المبدئية" extra={<span className="tag tag--ok-soft">مشفرة بنظام SHA-256</span>}>
-            ••••••••••••
-          </RTile>
-          <RTile label="سياسة الدخول الأول">إلزام المستخدم بتعيين كلمة مرور جديدة ومطابقة سياسة التعقيد</RTile>
-          <RTile label="المصادقة الثنائية (MFA)">إلزامية عبر تطبيق النفاذ الوطني الموحد ورسائل التحقق</RTile>
-        </div>
         <div className="infostrip infostrip--thin">
           <InfoCircleIcon size={22} className="infostrip__icon" />
-          <p>
-            سيتم إرسال رابط التفعيل المباشر وتعليمات الدخول الآمن إلى البريد الرسمي <a className="auth-link" href="#email" onClick={(e) => e.preventDefault()}>h.suwailem@procure.gov.sa</a> تلقائياً فور الضغط على زر الاعتماد.
-          </p>
+          <p>سيُنشئ النظام كلمة مرور مؤقتة تلقائياً، وتظهر لك مرة واحدة بعد إنشاء المستخدم لتسليمها له.</p>
         </div>
       </Section>
 
@@ -674,19 +595,18 @@ function Step4({ d, set, goTo, showError }) {
   );
 }
 
-/* ---------- validation: only the fields marked * in the design block "next" ---------- */
+/* ---------- validation: only what the API requires blocks "next" ---------- */
 function stepValid(step, d) {
-  if (step === 1) return [d.name, d.empId, d.email, d.phone, d.title].every((v) => v.trim());
-  if (step === 2) {
-    const r = evaluate(d.password, d.confirm);
-    return Boolean(d.username.trim()) && r.length && r.upper && r.digit && r.special && r.match;
-  }
+  if (step === 1) return [d.name, d.email].every((v) => v.trim());
+  if (step === 3) return d.roles.length > 0;
   return true;
 }
 
 /* ---------- page ---------- */
 export default function AddUser() {
   const navigate = useNavigate();
+  const { deptOpts, roleCards } = useUserFilterOptions();
+  const { createUser, isSaving, created } = useCreateUser();
   const [step, setStep] = useState(1);
   const [showErrors, setShowErrors] = useState(false);
   const [d, setD] = useState({
@@ -698,7 +618,7 @@ export default function AddUser() {
     unit: '',
     title: '',
     joined: '',
-    username: 's.otaibi',
+    username: '',
     password: '',
     confirm: '',
     forceChange: false,
@@ -715,7 +635,7 @@ export default function AddUser() {
 
   function create() {
     setShowErrors(true);
-    if (d.confirmed) navigate(`/users/${DETAIL_USER_ID}`);
+    if (d.confirmed && stepValid(1, d) && stepValid(3, d)) createUser(d);
   }
 
   const footer = {
@@ -735,12 +655,12 @@ export default function AddUser() {
       </section>
 
       {step === 4 ? (
-        <Step4 d={d} set={set} goTo={go} showError={showErrors} />
+        <Step4 d={d} set={set} goTo={go} showError={showErrors} roleOptions={roleCards} deptOpts={deptOpts} />
       ) : (
         <section className={'wcard wcard--body' + (step === 3 ? ' wcard--plain' : '')}>
-          {step === 1 && <Step1 d={d} set={set} showErrors={showErrors} />}
-          {step === 2 && <Step2 d={d} set={set} showErrors={showErrors} />}
-          {step === 3 && <Step3 d={d} set={set} />}
+          {step === 1 && <Step1 d={d} set={set} showErrors={showErrors} deptOpts={deptOpts} />}
+          {step === 2 && <Step2 d={d} set={set} />}
+          {step === 3 && <Step3 d={d} set={set} roleOptions={roleCards} showErrors={showErrors} />}
         </section>
       )}
 
@@ -762,6 +682,7 @@ export default function AddUser() {
           <button
             type="button"
             className="btn-primary wfooter__next"
+            disabled={isSaving}
             onClick={() => {
               if (step === 4) return create();
               if (!stepValid(step, d)) return setShowErrors(true);
@@ -773,6 +694,8 @@ export default function AddUser() {
           </button>
         </div>
       </footer>
+
+      {created && <TemporaryPasswordDialog password={created.temporary_password} onClose={() => navigate(`/users/${created.id}`)} />}
     </div>
   );
 }

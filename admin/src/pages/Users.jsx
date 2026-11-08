@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-import { USERS_PAGE_ROWS } from '../data.js';
-import { UsersFilters, UsersTable, useUserFilters } from '../components/UsersTable.jsx';
+import { Pagination, UsersFilters, UsersTable } from '../components/UsersTable.jsx';
+import { useUsersList, useUserStats } from '../hooks/use-users.js';
 import { IdCardIcon, UsersIcon, HourglassIcon, BanIcon } from '../components/Icons.jsx';
 
-const ROWS = USERS_PAGE_ROWS.map((r, i) => ({ ...r, rowKey: 'u' + i }));
+const count = (value) => (value === undefined ? '—' : value.toLocaleString('en-US'));
 
 function Stat({ icon, tint, value, label, sub, subClass }) {
   return (
@@ -22,7 +22,8 @@ function Stat({ icon, tint, value, label, sub, subClass }) {
 
 export default function Users() {
   const navigate = useNavigate();
-  const f = useUserFilters();
+  const list = useUsersList({ pageSize: 20 });
+  const stats = useUserStats();
   return (
     <div className="users-page">
       <div className="page-head">
@@ -44,38 +45,38 @@ export default function Users() {
         <Stat
           icon={<img className="tile-img" src="/assets/icons/tile-idcard.png" alt="" />}
           tint={{ bg: '#e8f6ff', fg: '#0b2a4a' }}
-          value="248"
+          value={count(stats.total)}
           label="إجمالي المستخدمين"
-          sub="↑ 6+ هذا الشهر"
-          subClass="is-green"
+          sub=""
         />
         <Stat
           icon={<img className="tile-img" src="/assets/icons/tile-users-green.png" alt="" />}
           tint={{ bg: '#eefff8', fg: '#0a5c36' }}
-          value="215"
+          value={count(stats.active)}
           label="المستخدمون النشطون"
-          sub="معدل النشاط اليومي 86.7%"
-          subClass="is-green"
+          sub=""
         />
         <Stat
           icon={<HourglassIcon size={26} />}
           tint={{ bg: '#e8f6ff', fg: '#0b2a4a' }}
-          value="12"
+          value="—"
           label="بانتظار التفعيل"
-          sub="دعوات معلقة"
+          sub=""
         />
         <Stat
           icon={<BanIcon size={26} />}
           tint={{ bg: '#fff4f4', fg: '#e84a4a' }}
-          value="15"
+          value={count(stats.inactive)}
           label="المقفلة وغير النشطة"
-          sub="تتطلب فحص أمني"
-          subClass="is-red"
+          sub=""
         />
       </div>
 
-      <UsersFilters f={f} layout="stacked" />
-      <UsersTable rows={ROWS} f={f} />
+      <UsersFilters f={list.filters} layout="stacked" />
+      <div className="paged">
+        <UsersTable rows={list.rows} isLoading={list.isLoading} />
+        <Pagination total={list.total} pageSize={list.pageSize} lastPage={list.lastPage} page={list.page} onPageChange={list.setPage} />
+      </div>
     </div>
   );
 }

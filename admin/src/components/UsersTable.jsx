@@ -1,11 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { STATUS, ROLES_FILTER, DEPTS_FILTER, DETAIL_USER_ID } from '../data.js';
+import { STATUS } from '../data.js';
+import { useResetUserPassword, useToggleUser, useUserFilterOptions } from '../hooks/use-users.js';
+import { LoadingBlock } from './Spinner.jsx';
+import TemporaryPasswordDialog from './TemporaryPasswordDialog.jsx';
 import {
   SearchIcon,
   RefreshIcon,
   ChevronDownIcon,
-  CloseCircleIcon,
   LockIcon,
   PencilIcon,
   DotsVerticalIcon,
@@ -20,8 +22,10 @@ import {
   KeyLockIcon,
 } from './Icons.jsx';
 
+const RESET_CONFIRM = 'هل تريد إعادة تعيين كلمة مرور هذا المستخدم؟ ستنتهي جلساته الحالية.';
+
 /* ---------- dropdown menu used by every ⋮ button ---------- */
-export function KebabMenu({ id = DETAIL_USER_ID, placement = 'below' }) {
+export function KebabMenu({ id, placement = 'below', onResetPassword }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const navigate = useNavigate();
@@ -64,7 +68,7 @@ export function KebabMenu({ id = DETAIL_USER_ID, placement = 'below' }) {
             role="menuitem"
             onClick={() => {
               setOpen(false);
-              navigate('/reset-password');
+              if (window.confirm(RESET_CONFIRM)) onResetPassword();
             }}
           >
             <span>إعادة تعيين كلمة المرور</span>
@@ -94,25 +98,10 @@ function Select({ value, onChange, placeholder, options }) {
 }
 
 /* ---------- filters ---------- */
-export function useUserFilters() {
-  const [q, setQ] = useState('');
-  const [role, setRole] = useState('');
-  const [dept, setDept] = useState('');
-  const [status, setStatus] = useState('');
-  const [chips, setChips] = useState(['الجهة:الهيئة العامة للمنافسة', 'الحالة:الكل عدا المحذوفين']);
-  const reset = () => {
-    setQ('');
-    setRole('');
-    setDept('');
-    setStatus('');
-  };
-  return { q, setQ, role, setRole, dept, setDept, status, setStatus, chips, setChips, reset };
-}
+const STATUS_OPTIONS = ['active', 'inactive'].map((key) => ({ value: key, label: STATUS[key].label }));
 
 export function UsersFilters({ f, layout = 'stacked' }) {
-  const roleOpts = ROLES_FILTER.map((r) => ({ value: r, label: r }));
-  const deptOpts = DEPTS_FILTER.map((r) => ({ value: r, label: r }));
-  const statusOpts = Object.entries(STATUS).map(([k, v]) => ({ value: k, label: v.label }));
+  const { roleOpts, deptOpts } = useUserFilterOptions();
 
   const search = (
     <label className="search-field">
@@ -120,7 +109,7 @@ export function UsersFilters({ f, layout = 'stacked' }) {
       <input
         value={f.q}
         onChange={(e) => f.setQ(e.target.value)}
-        placeholder="بحث بالاسم الكامل، اسم المستخدم (@user)، أو البريد الإلكتروني..."
+        placeholder="بحث بالاسم الكامل أو البريد الإلكتروني..."
       />
     </label>
   );
@@ -140,7 +129,7 @@ export function UsersFilters({ f, layout = 'stacked' }) {
     <>
       <Select value={f.role} onChange={f.setRole} placeholder="جميع الادوار والصلاحيات" options={roleOpts} />
       <Select value={f.dept} onChange={f.setDept} placeholder="كافة الإدارات والأقسام" options={deptOpts} />
-      <Select value={f.status} onChange={f.setStatus} placeholder="كافة الحالات" options={statusOpts} />
+      <Select value={f.status} onChange={f.setStatus} placeholder="كافة الحالات" options={STATUS_OPTIONS} />
     </>
   );
 
@@ -161,23 +150,6 @@ export function UsersFilters({ f, layout = 'stacked' }) {
           {refresh}
         </div>
       )}
-      <div className="filters__chips">
-        <span className="filters__label">الفلاتر المطبقة:</span>
-        {f.chips.map((c) => {
-          const [k, ...rest] = c.split(':');
-          return (
-            <span key={c} className="chip">
-              <button type="button" aria-label="إزالة" onClick={() => f.setChips(f.chips.filter((x) => x !== c))}>
-                <CloseCircleIcon size={16} />
-              </button>
-              {k}:{rest.join(':')}
-            </span>
-          );
-        })}
-        <button type="button" className="chips-clear" onClick={() => f.setChips([])}>
-          مسح الكل
-        </button>
-      </div>
     </section>
   );
 }
@@ -196,42 +168,21 @@ function StatusPill({ status }) {
 }
 
 /* ---------- table ---------- */
-export function UsersTable({ rows: initialRows, f }) {
-  const [rows, setRows] = useState(initialRows);
+export function UsersTable({ rows, isLoading }) {
   const [selected, setSelected] = useState(() => new Set());
   const navigate = useNavigate();
+  const { toggleUser, isToggling } = useToggleUser();
+  const { resetPassword, temporaryPassword, clearPassword } = useResetUserPassword();
 
-  const visible = useMemo(() => {
-    const q = f.q.trim().toLowerCase();
-    return rows.filter((r) => {
-      if (q && !(r.name + r.handle + r.email).toLowerCase().includes(q)) return false;
-      if (f.role && r.role !== f.role) return false;
-      if (f.dept && r.dept !== f.dept) return false;
-      if (f.status && r.status !== f.status) return false;
-      return true;
-    });
-  }, [rows, f.q, f.role, f.dept, f.status]);
-
-  const allSelected = visible.length > 0 && visible.every((r) => selected.has(r.rowKey));
+  const allSelected = rows.length > 0 && rows.every((r) => selected.has(r.rowKey));
 
   function toggleAll() {
-    setSelected(allSelected ? new Set() : new Set(visible.map((r) => r.rowKey)));
+    setSelected(allSelected ? new Set() : new Set(rows.map((r) => r.rowKey)));
   }
   function toggleOne(key) {
     const next = new Set(selected);
     next.has(key) ? next.delete(key) : next.add(key);
     setSelected(next);
-  }
-  function toggleLock(key) {
-    setRows((rs) =>
-      rs.map((r) =>
-        r.rowKey === key
-          ? r.status === 'disabled'
-            ? { ...r, status: r.prevStatus || 'inactive' }
-            : { ...r, prevStatus: r.status, status: 'disabled' }
-          : r
-      )
-    );
   }
 
   return (
@@ -248,12 +199,14 @@ export function UsersTable({ rows: initialRows, f }) {
         <span>آخر نشاط بالنظام</span>
         <span>الإجراءات</span>
       </div>
-      {visible.map((r) => (
+      {isLoading && <LoadingBlock />}
+      {!isLoading && rows.length === 0 && <div className="rlist__none">لا توجد نتائج مطابقة</div>}
+      {rows.map((r) => (
         <div className="utable__row" role="row" key={r.rowKey}>
           <span className="utable__cb">
             <input type="checkbox" className="cb" checked={selected.has(r.rowKey)} onChange={() => toggleOne(r.rowKey)} aria-label="تحديد" />
           </span>
-          <Link to={`/users/${DETAIL_USER_ID}`} className="uid">
+          <Link to={`/users/${r.id}`} className="uid">
             <span className={'avatar avatar--' + r.avatar}>{r.initials}</span>
             <span className="uid__text">
               <strong>
@@ -278,33 +231,35 @@ export function UsersTable({ rows: initialRows, f }) {
           </span>
           <span className="last">
             <strong>{r.last}</strong>
-            <small>{r.lastSub}</small>
+            <small><bdi dir="ltr">{r.lastSub}</bdi></small>
           </span>
           <span className="acts">
-            <button type="button" className="act act--edit" aria-label="تعديل" onClick={() => navigate(`/users/${DETAIL_USER_ID}/edit`)}>
+            <button type="button" className="act act--edit" aria-label="تعديل" onClick={() => navigate(`/users/${r.id}/edit`)}>
               <PencilIcon size={20} />
             </button>
-            <button type="button" className="act act--lock" aria-label="قفل" onClick={() => toggleLock(r.rowKey)}>
+            <button type="button" className="act act--lock" aria-label="قفل" disabled={isToggling} onClick={() => toggleUser(r)}>
               <LockIcon size={20} />
             </button>
-            <KebabMenu />
+            <KebabMenu id={r.id} onResetPassword={() => resetPassword(r.id)} />
           </span>
         </div>
       ))}
+      {temporaryPassword && <TemporaryPasswordDialog password={temporaryPassword} onClose={clearPassword} />}
     </div>
   );
 }
 
 /* ---------- pagination ---------- */
-export function Pagination({ total = 55, pageSize = 5, lastPage = 31, shown }) {
-  const [page, setPage] = useState(1);
-  const from = (page - 1) * pageSize + 1;
+export function Pagination({ total, pageSize, lastPage, page, onPageChange, unit = 'مستخدم' }) {
+  const from = total === 0 ? 0 : (page - 1) * pageSize + 1;
   const to = Math.min(page * pageSize, total);
-  const go = (p) => setPage(Math.max(1, Math.min(lastPage, p)));
+  const go = (p) => onPageChange(Math.max(1, Math.min(lastPage, p)));
+  const pages = [...new Set([1, 2, 3, page, lastPage])].filter((p) => p <= lastPage).sort((a, b) => b - a);
+
   return (
     <div className="pager">
       <span className="pager__info">
-        عرض {shown ? 1 : from} إلى {shown ? shown : to} من أصل {total} مستخدم
+        عرض {from} إلى {to} من أصل {total} {unit}
       </span>
       <div className="pager__ctrl">
         <button type="button" onClick={() => go(lastPage)} aria-label="الأخيرة">
@@ -313,15 +268,12 @@ export function Pagination({ total = 55, pageSize = 5, lastPage = 31, shown }) {
         <button type="button" onClick={() => go(page + 1)} aria-label="التالي">
           <ChevronLeftIcon size={16} />
         </button>
-        <button type="button" className={page === lastPage ? 'is-on' : ''} onClick={() => go(lastPage)}>
-          {lastPage}
-        </button>
-        <span>…</span>
-        {[3, 2, 1].map((p) => (
+        {pages.flatMap((p, i) => [
+          i > 0 && pages[i - 1] - p > 1 ? <span key={'gap' + p}>…</span> : null,
           <button key={p} type="button" className={page === p ? 'is-on' : ''} onClick={() => go(p)}>
             {p}
-          </button>
-        ))}
+          </button>,
+        ])}
         <button type="button" onClick={() => go(page - 1)} aria-label="السابق">
           <ChevronRightIcon size={16} />
         </button>

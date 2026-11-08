@@ -1,5 +1,7 @@
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useMaster, two } from '../../masterStore.jsx';
+import { useDepartment, useToggleDepartment } from '../../hooks/use-departments.js';
+import { LoadingBlock } from '../../components/Spinner.jsx';
 import { ITEM_LONG } from '../../masterData.js';
 import Cbx from '../../components/Cbx.jsx';
 import { StatusPill, RowActions } from './Bits.jsx';
@@ -50,18 +52,19 @@ const CardHead = ({ icon, title, tag }) => (
 export function DepartmentDetail() {
   const nav = useNavigate();
   const { id } = useParams();
-  const { departments, toggle } = useMaster();
-  const d = departments.find((x) => x.id === id);
+  const { department: d, isLoading } = useDepartment(id);
+  const { toggleDepartment } = useToggleDepartment();
+  if (isLoading) return <LoadingBlock />;
   if (!d) return <Navigate to="/master-data/departments" replace />;
-  const kids = departments.filter((k) => k.parent === d.name);
+  const kids = [];
   const off = d.status !== 'active';
   const kidsText = (k) => k.scope || 'نطاق المهام: ' + (k.desc || '');
   return (
     <div className="mdetail">
       <Head
-        title={d.name} sub="الهيكل التنظيمي المعتمد · المستوى القيادي الإداري الأول" upd={d.audited ? d.audited : UPD} center
-        chips={[{ t: '#' + d.code }, { t: d.level === 'main' ? 'إدارة رئيسية مستقلة' : 'قسم فرعي تابع' }, { t: off ? 'غير نشط' : 'نشط', ok: !off }, { t: 'مركز تكلفة رئيسي: ' + d.cc }]}
-        btns={<Btns onAdd={() => nav('/master-data/departments/new?parent=' + d.id)} addLabel="إضافة قسم فرعي" onEdit={() => nav(`/master-data/departments/${d.id}/edit`)} editLabel="تعديل بيانات القسم" off={off} onToggle={() => toggle('departments', d.id)} offLabel="تعطيل الإدارة" onLabel="إعادة تفعيل الإدارة" />}
+        title={d.name} upd="—" center
+        chips={[{ t: '#' + d.code }, { t: off ? 'غير نشط' : 'نشط', ok: !off }, { t: 'مركز تكلفة رئيسي: ' + d.cc }]}
+        btns={<Btns onEdit={() => nav(`/master-data/departments/${d.id}/edit`)} editLabel="تعديل بيانات القسم" off={off} onToggle={() => toggleDepartment(d)} offLabel="تعطيل الإدارة" onLabel="إعادة تفعيل الإدارة" />}
       />
       <div className="mcols">
         <div className="mcol">
@@ -71,8 +74,9 @@ export function DepartmentDetail() {
               <Tile label="اسم الوحدة التنظيمية" wide>{d.name}</Tile>
               <Tile label="الرقم المرجعي">{d.code}</Tile>
               <Tile label="مركز التكلفة">{d.cc}</Tile>
-              <Tile label="تاريخ الإنشاء">{d.created || CREATED}</Tile>
-              <Tile label="أخر تحديث وتدقيق">{d.audited || AUDITED}</Tile>
+              <Tile label="تاريخ الإنشاء">—</Tile>
+              <Tile label="أخر تحديث وتدقيق">—</Tile>
+              <Tile label="الموظفون النشطون">{d.staff}</Tile>
             </div>
           </section>
           <section className="mcard">
@@ -94,7 +98,7 @@ export function DepartmentDetail() {
                 <span className="mempty__icon"><span><TreeIcon size={44} /></span></span>
                 <h3>لا توجد أقسام فرعية تابعة</h3>
                 <p>ابدأ بإضافة القسم الفرعي الأول لبناء الهيكل التنظيمي للجهة. يمكنك لاحقاً تفريع الإدارات المساندة وربط مراكز التكلفة لاعتماد مسارات المنافسات والمشتريات آلياً وفق الحوكمة المعتمدة.</p>
-                <button type="button" className="btn-primary" onClick={() => nav('/master-data/departments/new?parent=' + d.id)}>إضافة أول قسم</button>
+                <button type="button" className="btn-primary" onClick={() => nav('/master-data/departments/new')}>إضافة أول قسم</button>
               </div>
             ) : (
               <>

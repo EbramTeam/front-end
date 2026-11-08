@@ -1,40 +1,27 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { KebabMenu } from '../components/UsersTable.jsx';
+import { LoadingBlock } from '../components/Spinner.jsx';
+import TemporaryPasswordDialog from '../components/TemporaryPasswordDialog.jsx';
+import { useResetUserPassword, useToggleUser, useUser } from '../hooks/use-users.js';
 import {
   LockIcon,
   PencilIcon,
   BuildingIcon,
   CalendarIcon,
-  VerifiedIcon,
   SlidersIcon,
   IdCardIcon,
   CopyIcon,
-  SyncIcon,
   ShieldCheckIcon,
 } from '../components/Icons.jsx';
+
+const EMPTY = '—';
 
 const SCENARIOS = [
   { key: 'new', label: 'مستخدم جديد (بدون نشاط)', dot: '#555' },
   { key: 'lead', label: 'مستخدم نشط وقيادي', dot: '#1a8cff' },
   { key: 'disabled', label: 'حساب معطل', dot: '#e53030' },
   { key: 'multi', label: 'أدوار متعددة', dot: '#1a8cff' },
-];
-
-const ROLES = [
-  {
-    main: true,
-    title: 'رئيس لجنة فحص العروض',
-    text: 'صلاحية كاملة لترؤس جلسات فتح وفحص العروض الفنية والمالية.',
-  },
-  {
-    title: 'معتمد طلبات الصرف المالي (حق 500,000 ر.س)',
-    text: 'حق اعتماد استمارات أوامر الشراء والارتباط المالي للمشاريع',
-  },
-  {
-    title: 'أخصائي منافسات استراتيجية',
-    text: 'إعداد كراسات الشروط والمواصفات، ومراجعة متطلبات الموردين',
-  },
 ];
 
 function InfoTile({ label, children, extra }) {
@@ -51,13 +38,19 @@ function InfoTile({ label, children, extra }) {
 
 export default function UserDetail() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const { user, isLoading } = useUser(id);
+  const { toggleUser, isToggling } = useToggleUser();
+  const { resetPassword, temporaryPassword, clearPassword } = useResetUserPassword();
   const [scenario, setScenario] = useState('lead');
   const [copied, setCopied] = useState(false);
-  const email = 'h.suwailem@procure.gov.sa';
+
+  if (isLoading) return <LoadingBlock />;
+  if (!user) return <Navigate to="/users" replace />;
 
   function copyEmail() {
     try {
-      navigator.clipboard?.writeText(email);
+      navigator.clipboard?.writeText(user.email);
     } catch (e) {
       /* clipboard may be unavailable */
     }
@@ -74,39 +67,32 @@ export default function UserDetail() {
         {/* profile card (right in RTL) */}
         <section className="dcard profile">
           <div className="profile__main">
-            <span className="profile__avatar">د.ح</span>
+            <span className="profile__avatar">{user.initials}</span>
             <div className="profile__info">
-              <div className="profile__row">
-                <span className="pill pill--id">EMP-04821</span>
-              </div>
-              <h2>د. حسام بن عبدالعزيز السويلم</h2>
+              <h2>{user.name}</h2>
               <p className="profile__meta">
                 <BuildingIcon size={18} />
-                الإدارة العامة للمنافسات والعقود
+                {user.dept}
               </p>
               <p className="profile__meta">
                 <CalendarIcon size={18} />
-                تاريخ الانضمام: 01 اكتوبر 2026 (منذ أقل من شهر)
-              </p>
-              <p className="profile__meta profile__meta--ok">
-                <VerifiedIcon size={18} />
-                مصادقة الهوية عبر النفاذ الوطني الموحد (IAM)
+                تاريخ إنشاء الحساب: {user.created}
               </p>
             </div>
           </div>
           <div className="profile__side">
             <div className="profile__side-top">
-              <span className="status st-active st-active--soft">
+              <span className={'status ' + (user.isActive ? 'st-active st-active--soft' : 'st-inactive')}>
                 <i className="status__dot" />
-                حساب نشط وموثق
+                {user.isActive ? 'حساب نشط' : 'حساب غير نشط'}
               </span>
-              <KebabMenu placement="above" />
+              <KebabMenu id={user.id} placement="above" onResetPassword={() => resetPassword(user.id)} />
             </div>
             <div className="profile__actions">
-              <button type="button" className="act act--edit act--lg" aria-label="تعديل" onClick={() => navigate('/users/EMP-04821/edit')}>
+              <button type="button" className="act act--edit act--lg" aria-label="تعديل" onClick={() => navigate(`/users/${user.id}/edit`)}>
                 <PencilIcon size={22} />
               </button>
-              <button type="button" className="act act--lock act--lg" aria-label="قفل">
+              <button type="button" className="act act--lock act--lg" aria-label="قفل" disabled={isToggling} onClick={() => toggleUser(user)}>
                 <LockIcon size={22} />
               </button>
             </div>
@@ -147,10 +133,9 @@ export default function UserDetail() {
               <IdCardIcon size={26} className="dcard__head-icon" />
               المعلومات الوظيفية والأساسية
             </h3>
-            <span className="soft-pill">سجل مركزي موثق</span>
           </div>
           <div className="info__grid">
-            <InfoTile label="الاسم الكامل">د. حسام بن عبدالعزيز السويلم</InfoTile>
+            <InfoTile label="الاسم الكامل">{user.name}</InfoTile>
             <InfoTile
               label="البريد الإلكتروني الحكومي"
               extra={
@@ -159,31 +144,12 @@ export default function UserDetail() {
                 </button>
               }
             >
-              <span dir="ltr">h.suwailem@procure.gov.sa</span>
+              <span dir="ltr">{user.email}</span>
             </InfoTile>
-            <InfoTile label="الرقم الوظيفي" extra={<span className="tag tag--hr">مفعل في HR</span>}>
-              <span className="pill pill--id" dir="ltr">EMP-04821</span>
-            </InfoTile>
-            <InfoTile
-              label="رقم الهاتف المحمول"
-              extra={
-                <span className="tag tag--small">
-                  <VerifiedIcon size={11} />
-                  موثق نفاذ
-                </span>
-              }
-            >
-              <span dir="ltr">+966 50 123 4567</span>
-            </InfoTile>
-            <InfoTile label="الإدارة / القسم">الإدارة العامة للمنافسات والعقود</InfoTile>
-            <InfoTile label="الوحدة التنظيمية الفرعية">وحدة فحص العروض والترسية</InfoTile>
-          </div>
-          <div className="info__sync">
-            <span>
-              <SyncIcon size={18} />
-              تتم مزامنة البيانات الشخصية والوظيفية آلياً مع منصة الموارد البشرية المركزية.
-            </span>
-            <small>تحديث: منذ ساعتين</small>
+            <InfoTile label="الرقم الوظيفي">{EMPTY}</InfoTile>
+            <InfoTile label="رقم الهاتف المحمول">{EMPTY}</InfoTile>
+            <InfoTile label="الإدارة / القسم">{user.dept}</InfoTile>
+            <InfoTile label="الوحدة التنظيمية الفرعية">{EMPTY}</InfoTile>
           </div>
         </section>
 
@@ -193,53 +159,36 @@ export default function UserDetail() {
               <ShieldCheckIcon size={26} className="dcard__head-icon" />
               بيانات الحساب والأمان
             </h3>
-            <span className="tag tag--ok">
-              <i />
-              متوافق مع ضوابط NCA
-            </span>
           </div>
           <dl className="account__list">
             <div>
               <dt>حالة الحساب</dt>
-              <dd className="is-ok">
-                <i /> نشط (معتمد وموثق عبر IAM)
+              <dd className={user.isActive ? 'is-ok' : 'plain'}>
+                {user.isActive && <i />} {user.isActive ? 'نشط' : 'غير نشط'}
               </dd>
             </div>
             <div>
               <dt>المصادقة الثنائية (2FA)</dt>
-              <dd>
-                <span className="tag tag--ok-soft">مفعلة إلزامياً (NCA-CCC)</span>
-              </dd>
+              <dd className="plain">{EMPTY}</dd>
             </div>
             <div>
               <dt>تاريخ إنشاء الحساب</dt>
-              <dd className="plain">01 رجب 1446 هـ (09:30 ص)</dd>
+              <dd className="plain">{user.created}</dd>
             </div>
             <div>
               <dt>منشئ الحساب</dt>
-              <dd className="plain">
-                <a
-                  href="/users/EMP-04821"
-                  className="auth-link"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navigate('/users/a.almansour');
-                  }}
-                >
-                  د. عبدالله المنصور (مدير النظام)
-                </a>
-              </dd>
+              <dd className="plain">{EMPTY}</dd>
             </div>
             <div>
               <dt>آخر تسجيل دخول</dt>
               <dd className="plain two">
-                <span>اليوم 10:45 ص</span>
-                <small dir="ltr">IP: 10.20.14.88 (غزة)</small>
+                {user.last}
+                {user.lastSub && <small><bdi dir="ltr">{user.lastSub}</bdi></small>}
               </dd>
             </div>
             <div>
               <dt>آخر تحديث بيانات</dt>
-              <dd className="plain">أمس 02:15 م (عبر الموارد البشرية)</dd>
+              <dd className="plain">{EMPTY}</dd>
             </div>
           </dl>
         </section>
@@ -251,18 +200,18 @@ export default function UserDetail() {
             <ShieldCheckIcon size={26} className="dcard__head-icon" />
             الأدوار والصلاحيات المعتمدة
           </h3>
-          <span className="soft-pill">3 أدوار معتمدة</span>
+          <span className="soft-pill">{user.roles.length} أدوار معتمدة</span>
         </div>
         <div className="roles__grid">
-          {ROLES.map((r) => (
-            <article key={r.title} className={'rcard' + (r.main ? ' rcard--main' : '')}>
-              {r.main && <span className="rcard__badge">الدور الرئيسي</span>}
-              <h4>{r.title}</h4>
-              <p>{r.text}</p>
+          {user.roles.map((role, index) => (
+            <article key={role.id} className={'rcard' + (index === 0 ? ' rcard--main' : '')}>
+              <h4>{role.label}</h4>
             </article>
           ))}
         </div>
       </section>
+
+      {temporaryPassword && <TemporaryPasswordDialog password={temporaryPassword} onClose={clearPassword} />}
     </div>
   );
 }

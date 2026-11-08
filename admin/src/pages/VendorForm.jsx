@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { DETAIL, SEED_FILES } from '../vendorsData.js';
-import { useVendors } from '../vendorsStore.jsx';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useSaveSupplier, useSupplier } from '../hooks/use-suppliers.js';
+import { LoadingBlock, Spinner } from '../components/Spinner.jsx';
 import Cbx from '../components/Cbx.jsx';
 import { CertIcon, IdCardIcon, SendMailIcon, ShieldCheckIcon, UploadIcon, FileBadgeIcon, TrashIcon, ChevronDownIcon, CopyIcon, CircleCheckIcon, ClockHistoryIcon } from '../components/Icons.jsx';
 
@@ -28,21 +28,32 @@ const RULES = [
 ];
 
 export default function VendorForm({ edit }) {
-  const navigate = useNavigate();
+  return edit ? <EditVendorForm /> : <VendorFormBody />;
+}
+
+function EditVendorForm() {
   const { id } = useParams();
-  const { vendors, addVendor, updateVendor } = useVendors();
-  const v = edit ? vendors.find((x) => x.id === id) || vendors[0] : null;
-  const d = { ...DETAIL, ...(v?.detail || {}) };
-  const init = edit
-    ? {
-        name: v.name, cr: v.cr, activity: v.activityFull || v.activity, vat: v.vat, grade: v.gradeFull || v.grade,
-        rep: d.rep, title: d.repTitle, phone: v.isNew ? v.phone : '059', mail: d.mail, city: v.isNew ? d.city : 'غزة (المقر الرئيسي)', addr: v.isNew ? d.address : 'غزة - شارع الكلا',
-      }
-    : { name: '', cr: '', activity: '', vat: '', grade: '', rep: '', title: '', phone: '', mail: '', city: '', addr: '' };
+  const { vendor, isLoading } = useSupplier(id);
+  if (isLoading) return <LoadingBlock />;
+  if (!vendor) return <Navigate to="/vendors" replace />;
+  return <VendorFormBody key={id} vendor={vendor} />;
+}
+
+const BLANK_FORM = { name: '', cr: '', activity: '', vat: '', grade: '', rep: '', title: '', phone: '', mail: '', city: '', addr: '' };
+
+function VendorFormBody({ vendor: v }) {
+  const edit = Boolean(v);
+  const navigate = useNavigate();
+  const { saveSupplier, isSaving } = useSaveSupplier(v?.id, (savedId) => {
+    navigate(edit ? '/vendors/' + savedId : '/vendors');
+    window.scrollTo({ top: 0 });
+  });
+  const d = v?.detail ?? {};
+  const init = v?.form ?? BLANK_FORM;
   const [f, setF] = useState(init);
   const [dirty, setDirty] = useState({});
   const [active, setActive] = useState(null);
-  const [files, setFiles] = useState(edit ? SEED_FILES : []);
+  const [files, setFiles] = useState([]);
   const [tried, setTried] = useState(false);
   const [drag, setDrag] = useState(false);
   const [uploadErr, setUploadErr] = useState('');
@@ -66,7 +77,7 @@ export default function VendorForm({ edit }) {
     if (next.length) setFiles((p) => [...p, ...next]);
   }
 
-  const required = ['name', 'cr', 'activity', 'vat', 'grade', 'rep', 'title', 'phone', 'mail', 'city', 'addr'];
+  const required = ['name', 'vat', 'rep', 'phone', 'mail', 'addr'];
   const bad = (k) => tried && !String(f[k]).trim();
 
   function submit(e) {
@@ -76,14 +87,7 @@ export default function VendorForm({ edit }) {
       document.querySelector('.vf.is-bad input')?.focus();
       return;
     }
-    if (edit) {
-      updateVendor(v.id, f, active);
-      navigate('/vendors/' + v.id);
-    } else {
-      addVendor(f, active);
-      navigate('/vendors');
-      window.scrollTo({ top: 0 });
-    }
+    saveSupplier({ form: f, active });
   }
 
   const input = (k, ph, extra = {}) => (
@@ -101,8 +105,7 @@ export default function VendorForm({ edit }) {
               <div className="vhead__title">
                 <h1>{v.name}</h1>
                 <div className="vhead__badges">
-                  <em className="vpill-ok"><i />نشط ومؤهل</em>
-                  <span className="vpill-cr"><CircleCheckIcon size={14} />سجل تجاري موثق (ZATCA &amp; MC)</span>
+                  {v.status === 'active' ? <em className="vpill-ok"><i />نشط ومؤهل</em> : <em className="vpill-off"><i />غير نشط · معلق إداريا</em>}
                 </div>
               </div>
               <div className="vhead__meta">
@@ -130,11 +133,11 @@ export default function VendorForm({ edit }) {
             </header>
             <Field label="اسم المورد / الكيان التجاري" req bad={bad('name')}>{input('name', 'شركة التقنية المتقدمة للحلول الرقمية ذ.م.م')}</Field>
             <div className="vf2">
-              <Field label="رقم السجل التجاري / الرقم الموحد (10 أرقام)" req bad={bad('cr')}>
+              <Field label="رقم السجل التجاري / الرقم الموحد (10 أرقام)">
                 {input('cr', '1010482910', { inputMode: 'numeric', maxLength: 10 })}
               </Field>
-              <Field label="نوع النشاط الرئيسي" req bad={bad('activity')}>{input('activity', 'توريد تقني وتكنولوجيا المعلومات')}</Field>
-              <Field label="رقم السجل التجاري / الرقم الموحد (10 أرقام)" req bad={bad('grade')}>
+              <Field label="نوع النشاط الرئيسي">{input('activity', 'توريد تقني وتكنولوجيا المعلومات')}</Field>
+              <Field label="رقم السجل التجاري / الرقم الموحد (10 أرقام)">
                 <div className="vselect">
                   <select className={'vin' + ghost('grade')} value={f.grade} onChange={set('grade')}>
                     <option value="" disabled>الدرجة الأولى (أ) - مشاريع كبرى واستراتيجية</option>
@@ -169,7 +172,7 @@ export default function VendorForm({ edit }) {
             </header>
             <div className="vf2">
               <Field label="اسم المفوض / جهة الاتصال الرسمية" req bad={bad('rep')}>{input('rep', 'أ. عبد العزيز فهد السالم')}</Field>
-              <Field label="المسمى الوظيفي للمفوض" req bad={bad('title')}>{input('title', 'مدير علاقات الموردين والتعاقدات الحكومية')}</Field>
+              <Field label="المسمى الوظيفي للمفوض">{input('title', 'مدير علاقات الموردين والتعاقدات الحكومية')}</Field>
               <Field label="رقم الجوال" req bad={bad('phone')}>
                 <div className="vphone">
                   <input className={'vin' + ghost('phone')} value={f.phone} onChange={set('phone')} placeholder="059" inputMode="tel" />
@@ -177,7 +180,7 @@ export default function VendorForm({ edit }) {
                 </div>
               </Field>
               <Field label="البريد الإلكتروني للتعاملات" req bad={bad('mail')}>{input('mail', 'procurement@advtech.sa', { type: 'email', dir: 'ltr' })}</Field>
-              <Field label="المدينة / المنطقة الرئيسية" req bad={bad('city')}>{input('city', 'غزة (المقر الرئيسي)')}</Field>
+              <Field label="المدينة / المنطقة الرئيسية">{input('city', 'غزة (المقر الرئيسي)')}</Field>
               <Field label="عنوان المقر" req bad={bad('addr')}>{input('addr', 'غزة - شارع الكلا')}</Field>
             </div>
           </section>
@@ -240,7 +243,7 @@ export default function VendorForm({ edit }) {
       </div>
 
       <div className="vfoot">
-        <button type="submit" className="btn-primary">{edit ? 'حفظ التعديلات' : 'إضافة مورد جديد'}</button>
+        <button type="submit" className="btn-primary" disabled={isSaving}>{isSaving && <Spinner size="sm" tone="onPrimary" />}{edit ? 'حفظ التعديلات' : 'إضافة مورد جديد'}</button>
         <button type="button" className="btn-outline" onClick={() => navigate(edit ? '/vendors/' + v.id : '/vendors')}>إلغاء</button>
       </div>
     </form>

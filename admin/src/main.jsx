@@ -6,8 +6,16 @@ import '@fontsource/montserrat/500.css';
 import '@fontsource/montserrat/600.css';
 import '@fontsource/montserrat/700.css';
 import './styles/fonts.css';
+import { QueryClientProvider } from '@tanstack/react-query';
 import App from './App.jsx';
+import GlobalLoader from './components/GlobalLoader.jsx';
+import Toaster from './components/Toaster.jsx';
+import { queryClient } from './lib/query-client.js';
+import { setErrorHandler } from './lib/api-client.js';
+import { notifyError } from './hooks/use-notify.js';
 import { setLanguage } from './i18n/translate.js';
+
+setErrorHandler(notifyError);
 
 let savedLang = 'ar';
 try {
@@ -28,7 +36,11 @@ window.addEventListener('resize', fitToDesign);
 setLanguage(savedLang); // قبل الرسم: يطبّق ملف التنسيق واتجاه الصفحة
 
 createRoot(document.getElementById('root')).render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>
+  <QueryClientProvider client={queryClient}>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+    <GlobalLoader />
+    <Toaster />
+  </QueryClientProvider>
 );

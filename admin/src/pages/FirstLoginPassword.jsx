@@ -1,13 +1,17 @@
-import { signIn } from '../auth.js';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+import { isAuthed } from '../auth.js';
 import AuthLayout, { AuthHero, Field } from '../components/AuthLayout.jsx';
 import { RulesBox, MatchBar, evaluate } from '../components/PasswordRules.jsx';
 import { ShieldLockIcon } from '../components/Icons.jsx';
+import { FullScreenLoader, Spinner } from '../components/Spinner.jsx';
+import { useChangePassword, useCurrentUser, useLogout } from '../hooks/use-auth.js';
 
 // "إنشاء كلمة مرور جديدة" for the first session (temporary password)
 export default function FirstLoginPassword() {
-  const navigate = useNavigate();
+  const { user, isLoading } = useCurrentUser();
+  const { changePassword, isSaving } = useChangePassword();
+  const { logout, isLoggingOut } = useLogout();
   const [temp, setTemp] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -18,8 +22,12 @@ export default function FirstLoginPassword() {
   function onSubmit(e) {
     e.preventDefault();
     setSubmitted(true);
-    if (valid) { signIn(); navigate('/'); }
+    if (valid) changePassword({ current_password: temp, password, password_confirmation: confirm });
   }
+
+  if (!isAuthed()) return <Navigate to="/login" replace />;
+  if (isLoading) return <FullScreenLoader />;
+  if (user && !user.must_change_password) return <Navigate to="/" replace />;
 
   return (
     <AuthLayout>
@@ -71,10 +79,11 @@ export default function FirstLoginPassword() {
             invalid={submitted && !rules.match}
           />
           <MatchBar matched={rules.match} />
-          <button type="submit" className="btn-primary btn-primary--lg btn-gap-top">
+          <button type="submit" className="btn-primary btn-primary--lg btn-gap-top" disabled={isSaving}>
+            {isSaving && <Spinner size="sm" tone="onPrimary" />}
             حفظ والمتابعة إلى المنظومة
           </button>
-          <button type="button" className="btn-outline btn-outline--lg" onClick={() => navigate('/login')}>
+          <button type="button" className="btn-outline btn-outline--lg" disabled={isLoggingOut} onClick={logout}>
             تسجيل الخروج والعودة لاحقا
           </button>
         </form>

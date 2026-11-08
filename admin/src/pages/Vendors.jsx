@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ACTIVITY_OPTIONS, GRADE_OPTIONS } from '../vendorsData.js';
-import { useVendors } from '../vendorsStore.jsx';
+import { useSuppliersList, useSupplierStats } from '../hooks/use-suppliers.js';
+import { Pagination } from '../components/UsersTable.jsx';
 import {
   IdCardIcon, VerifiedIcon, PauseCircleIcon, SearchIcon, RefreshIcon, ChevronDownIcon, DotsVerticalIcon,
   TrendUpIcon, CircleXIcon, CircleCheckIcon, WarnIcon, PinIcon, MailIcon, PhoneIcon, ShieldCheckIcon,
 } from '../components/Icons.jsx';
 
 const STATUS_OPTIONS = ['الكل', 'نشط', 'غير نشط / معلق'];
-const DEFAULTS = { q: '', status: 'نشط', activity: 'توريد تقني وتكنولوجيا', grade: 'الكل' };
+const DEFAULTS = { q: '', status: 'الكل' };
+const count = (value) => (value === undefined ? '—' : value.toLocaleString('en-US'));
 
 function Stat({ icon, tint, value, label, pill, pillClass }) {
   return (
@@ -23,11 +24,11 @@ function Stat({ icon, tint, value, label, pill, pillClass }) {
   );
 }
 
-function Sel({ label, value, options, onChange, prefix }) {
+function Sel({ label, value, options, onChange, prefix, disabled }) {
   const opts = options.includes(value) ? options : [value, ...options];
   return (
     <label className="vsel">
-      <select value={value} onChange={(e) => onChange(e.target.value)} aria-label={label}>
+      <select value={value} disabled={disabled} onChange={(e) => onChange(e.target.value)} aria-label={label}>
         {opts.map((o) => (
           <option key={o} value={o}>{prefix ? prefix + o : o}</option>
         ))}
@@ -64,38 +65,15 @@ function RowMenu({ onOpen, onEdit }) {
 
 export default function Vendors() {
   const navigate = useNavigate();
-  const { vendors: VENDORS } = useVendors();
   const [f, setF] = useState(DEFAULTS);
-  const [touched, setTouched] = useState(false); // التصميم يعرض كل الصفوف مع الفلاتر الافتراضية؛ الفلترة تبدأ عند أول تعديل
-  const set = (k, v) => {
-    setTouched(true);
-    setF((p) => ({ ...p, [k]: v }));
-  };
+  const list = useSuppliersList(f);
+  const stats = useSupplierStats();
+  const rows = list.rows;
+  const set = (k, v) => setF((p) => ({ ...p, [k]: v }));
   const clear = (k) => set(k, k === 'q' ? '' : 'الكل');
-  const reset = () => {
-    setTouched(false);
-    setF(DEFAULTS);
-  };
-  const clearAll = () => {
-    setTouched(true);
-    setF({ q: '', status: 'الكل', activity: 'الكل', grade: 'الكل' });
-  };
+  const reset = () => setF(DEFAULTS);
 
-  const rows = !touched
-    ? VENDORS
-    : VENDORS.filter((v) => {
-        if (f.q && !(v.name.includes(f.q) || v.cr.includes(f.q) || v.vat.includes(f.q))) return false;
-        if (f.status === 'نشط' && v.status !== 'active') return false;
-        if (f.status === 'غير نشط / معلق' && v.status === 'active') return false;
-        if (f.activity !== 'الكل' && !v.activityFull?.startsWith(f.activity) && v.activity !== f.activity && !(f.activity === 'توريد تقني وتكنولوجيا' && v.activity === 'حلول وتقنية المعلومات')) return false;
-        if (f.grade !== 'الكل' && v.grade !== f.grade) return false;
-        return true;
-      });
-
-  const chips = [
-    f.status !== 'الكل' && { k: 'status', t: 'الحالة: ' + f.status },
-    f.activity !== 'الكل' && { k: 'activity', t: 'نوع النشاط: توريد وتقنية' },
-  ].filter(Boolean);
+  const chips = [f.status !== 'الكل' && { k: 'status', t: 'الحالة: ' + f.status }].filter(Boolean);
 
   return (
     <div className="vendors-page">
@@ -110,14 +88,10 @@ export default function Vendors() {
       </div>
 
       <div className="vstats">
-        <Stat icon={<IdCardIcon size={26} />} tint={{ bg: '#e8f6ff', fg: '#0b2a4a' }} value="1,148" label="إجمالي الموردين المعتمدين"
-          pill={<>ربع سنوي +24 <TrendUpIcon size={14} /></>} pillClass="is-green" />
-        <Stat icon={<VerifiedIcon size={26} />} tint={{ bg: '#eefff8', fg: '#0a5c36' }} value="1,092" label="موردون بحالة نشطة"
-          pill="من الإجمالي 95.1%" pillClass="is-green" />
-        <Stat icon={<PauseCircleIcon size={26} />} tint={{ bg: '#fff9e8', fg: '#e84a4a' }} value="56" label="موردون معلقون / غير نشطين"
-          pill="مراجعة مطلوبة 4.9%" pillClass="is-red" />
-        <Stat icon={<ShieldCheckIcon size={26} />} tint={{ bg: '#eefff8', fg: '#0a5c36' }} value="99.8%" label="موثوقية الربط الحكومي (MC)"
-          pill="متطابق وآني" pillClass="is-blue" />
+        <Stat icon={<IdCardIcon size={26} />} tint={{ bg: '#e8f6ff', fg: '#0b2a4a' }} value={count(stats.total)} label="إجمالي الموردين المعتمدين" />
+        <Stat icon={<VerifiedIcon size={26} />} tint={{ bg: '#eefff8', fg: '#0a5c36' }} value={count(stats.active)} label="موردون بحالة نشطة" />
+        <Stat icon={<PauseCircleIcon size={26} />} tint={{ bg: '#fff9e8', fg: '#e84a4a' }} value={count(stats.inactive)} label="موردون معلقون / غير نشطين" />
+        <Stat icon={<ShieldCheckIcon size={26} />} tint={{ bg: '#eefff8', fg: '#0a5c36' }} value="—" label="موثوقية الربط الحكومي (MC)" />
       </div>
 
       <section className="vfilters">
@@ -127,8 +101,8 @@ export default function Vendors() {
             <input value={f.q} onChange={(e) => set('q', e.target.value)} placeholder="شركة التقنية" aria-label="بحث عن مورد" />
           </label>
           <Sel label="الحالة" prefix="الحالة: " value={f.status} options={STATUS_OPTIONS} onChange={(v) => set('status', v)} />
-          <Sel label="نوع النشاط" value={f.activity} options={['الكل', ...ACTIVITY_OPTIONS.slice(1)]} onChange={(v) => set('activity', v)} />
-          <Sel label="التصنيف" prefix="التصنيف: " value={f.grade} options={GRADE_OPTIONS} onChange={(v) => set('grade', v)} />
+          <Sel label="نوع النشاط" value="الكل" options={['الكل']} disabled />
+          <Sel label="التصنيف" prefix="التصنيف: " value="الكل" options={['الكل']} disabled />
           <button type="button" className="vrefresh" aria-label="تحديث" onClick={reset}>
             <RefreshIcon size={20} />
           </button>
@@ -147,7 +121,7 @@ export default function Vendors() {
               بحث: {f.q}
             </button>
           )}
-          <button type="button" className="vchips__clear" onClick={clearAll}>مسح الكل</button>
+          <button type="button" className="vchips__clear" onClick={reset}>مسح الكل</button>
         </div>
       </section>
 
@@ -213,12 +187,16 @@ export default function Vendors() {
                 </td>
               </tr>
             ))}
-            {rows.length === 0 && (
+            {!list.isLoading && rows.length === 0 && (
               <tr className="vtable__empty"><td colSpan={8}>لا توجد نتائج مطابقة</td></tr>
+            )}
+            {list.isLoading && (
+              <tr className="vtable__empty"><td colSpan={8}>جارٍ التحميل…</td></tr>
             )}
           </tbody>
         </table>
       </div>
+      <Pagination total={list.total} pageSize={list.pageSize} lastPage={list.lastPage} page={list.page} onPageChange={list.setPage} unit="مورد" />
     </div>
   );
 }

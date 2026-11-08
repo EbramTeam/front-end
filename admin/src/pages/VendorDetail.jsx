@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { DETAIL } from '../vendorsData.js';
-import { useVendors } from '../vendorsStore.jsx';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useSupplier, useToggleSupplier } from '../hooks/use-suppliers.js';
+import { LoadingBlock } from '../components/Spinner.jsx';
 import { VendorStatusModal } from '../components/VendorModals.jsx';
 import {
   CopyIcon, FingerprintIcon, IdCardIcon, SendMailIcon, ClockHistoryIcon, CircleCheckIcon, PhoneIcon,
@@ -41,17 +41,14 @@ function Tile({ label, children, sub, copy, icon }) {
 export default function VendorDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { vendors, setStatus } = useVendors();
-  const vendor = vendors.find((v) => v.id === id) || vendors[0];
-  // المورد المضاف حديثاً: نعرض بياناته هو، والحقول غير المتوفرة تبقى "—"
-  const d = vendor.isNew
-    ? {
-        uid: '—', created: vendor.updatedLong, createdBy: vendor.by, hash: '—', legalForm: '—', crExpiry: '—',
-        updatedLong: vendor.updatedLong, rep: vendor.detail.rep, repTitle: vendor.detail.repTitle, office: '—',
-        mobile: vendor.detail.mobile, mail: vendor.detail.mail, address: vendor.detail.address, timeline: [],
-      }
-    : { ...DETAIL, ...(vendor.detail || {}), updatedLong: vendor.updatedLong || DETAIL.updatedLong, address: vendor.detail?.address || DETAIL.address };
+  const { vendor, isLoading } = useSupplier(id);
+  const { toggleSupplier } = useToggleSupplier();
   const [modal, setModal] = useState(null);
+
+  if (isLoading) return <LoadingBlock />;
+  if (!vendor) return <Navigate to="/vendors" replace />;
+
+  const d = vendor.detail;
   const off = vendor.status === 'suspended';
 
   return (
@@ -62,7 +59,6 @@ export default function VendorDetail() {
             <h1>{vendor.name}</h1>
             <div className="vhead__badges">
               {off ? <em className="vpill-off"><i />غير نشط · معلق إداريا</em> : <em className="vpill-ok"><i />نشط ومؤهل</em>}
-              <span className="vpill-cr"><CircleCheckIcon size={14} />سجل تجاري موثق (ZATCA &amp; MC)</span>
             </div>
           </div>
           <div className="vhead__meta">
@@ -90,7 +86,7 @@ export default function VendorDetail() {
               <strong>هذا المورد غير نشط حاليّا</strong>
               <span className="vban__tag">حظر تعاقدي</span>
             </div>
-            <p>تم تعطيل المورد بقرار إداري رقابي في 24 أكتوبر 2024. لا يمكن دعوة هذا الكيان للمنافسات أو إصدار أوامر شراء جديدة حتى تتم إعادة تفعيله من قبل مدير النظام بعد استيفاء شروط المصادقة.</p>
+            <p>تم تعطيل المورد بقرار إداري رقابي. لا يمكن دعوة هذا الكيان للمنافسات أو إصدار أوامر شراء جديدة حتى تتم إعادة تفعيله من قبل مدير النظام بعد استيفاء شروط المصادقة.</p>
           </div>
           <button type="button" className="vbtn vbtn--blue" onClick={() => setModal('reactivate')}>إعادة تفعيل</button>
         </section>
@@ -182,7 +178,7 @@ export default function VendorDetail() {
           vendor={vendor}
           onClose={() => setModal(null)}
           onConfirm={() => {
-            setStatus(vendor.id, modal === 'deactivate' ? 'suspended' : 'active');
+            toggleSupplier({ id: vendor.id, active: modal !== 'deactivate' });
             setModal(null);
             window.scrollTo({ top: 0 });
           }}

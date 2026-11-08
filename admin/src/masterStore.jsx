@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from 'react';
-import { DEPARTMENTS, ITEMS, UNITS, CATEGORIES, DEPT_MAIN } from './masterData.js';
+import { ITEMS, UNITS, CATEGORIES } from './masterData.js';
 
 const Ctx = createContext(null);
 const BY = 'د. محمد كسبة';
@@ -8,15 +8,14 @@ const today = () => { const d = new Date(); return `${d.getDate()} ${AR_MONTHS[d
 let seq = 100;
 const nid = (p) => p + ++seq;
 
-export const SEED_COUNT = { departments: DEPARTMENTS.length, items: ITEMS.length, units: UNITS.length, categories: CATEGORIES.filter((c) => c.inList && c.level === 1).length };
+export const SEED_COUNT = { items: ITEMS.length, units: UNITS.length, categories: CATEGORIES.filter((c) => c.inList && c.level === 1).length };
 
 export function MasterProvider({ children }) {
-  const [departments, setDepartments] = useState(DEPARTMENTS);
   const [items, setItems] = useState(ITEMS);
   const [units, setUnits] = useState(UNITS);
   const [categories, setCategories] = useState(CATEGORIES);
 
-  const S = { departments: [departments, setDepartments], items: [items, setItems], units: [units, setUnits], categories: [categories, setCategories] };
+  const S = { items: [items, setItems], units: [units, setUnits], categories: [categories, setCategories] };
   const stamp = { date: today(), by: BY };
 
   const add = (kind, rec) => { const id = nid(kind[0]); S[kind][1]((p) => [{ id, ...rec, ...stamp, created: today(), audited: today() }, ...p]); return id; };
@@ -24,7 +23,7 @@ export function MasterProvider({ children }) {
   const remove = (kind, id) => S[kind][1]((p) => p.filter((r) => r.id !== id));
   const toggle = (kind, id) => S[kind][1]((p) => p.map((r) => (r.id === id ? { ...r, status: r.status === 'active' ? 'off' : 'active', ...stamp, audited: today() } : r)));
 
-  return <Ctx.Provider value={{ departments, items, units, categories, add, update, remove, toggle, DEPT_MAIN }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ items, units, categories, add, update, remove, toggle }}>{children}</Ctx.Provider>;
 }
 export const useMaster = () => useContext(Ctx);
 

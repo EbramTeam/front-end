@@ -23,8 +23,10 @@ import r_master from './master.css?inline';
 import l_master from '../styles-ltr/master.css?inline';
 import r_mobile from './mobile.css?inline';
 import l_mobile from '../styles-ltr/mobile.css?inline';
-const RTL = [r_global,r_layout,r_login,r_dashboard,r_users,r_detail,r_wizard,r_roles,r_responsive,r_vendors,r_master,r_mobile].join('\n');
-const LTR = [l_global,l_layout,l_login,l_dashboard,l_users,l_detail,l_wizard,l_roles,l_responsive,l_vendors,l_master,l_mobile].join('\n');
+import r_feedback from './feedback.css?inline';
+import l_feedback from '../styles-ltr/feedback.css?inline';
+const RTL = [r_global,r_layout,r_login,r_dashboard,r_users,r_detail,r_wizard,r_roles,r_responsive,r_vendors,r_master,r_mobile,r_feedback].join('\n');
+const LTR = [l_global,l_layout,l_login,l_dashboard,l_users,l_detail,l_wizard,l_roles,l_responsive,l_vendors,l_master,l_mobile,l_feedback].join('\n');
 let el = null;
 export function applyCss(lang) {
   if (!el) {

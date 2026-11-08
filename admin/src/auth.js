@@ -1,5 +1,26 @@
-// تسجيل دخول تجريبي (بدون Backend): الحالة بالـ sessionStorage، تنتهي بإغلاق المتصفح
-const KEY = 'ibram-auth';
-export const isAuthed = () => { try { return sessionStorage.getItem(KEY) === '1'; } catch { return false; } };
-export const signIn = () => { try { sessionStorage.setItem(KEY, '1'); } catch {} };
-export const signOut = () => { try { sessionStorage.removeItem(KEY); } catch {} };
+// توكن الـ API: في sessionStorage افتراضياً، وفي localStorage عند اختيار "تذكرني"
+const TOKEN_KEY = 'ibram-token';
+
+export function getToken() {
+  try {
+    return sessionStorage.getItem(TOKEN_KEY) ?? localStorage.getItem(TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export const isAuthed = () => Boolean(getToken());
+
+export function clearSession() {
+  try {
+    sessionStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(TOKEN_KEY);
+  } catch {}
+}
+
+export function setSession(token, remember) {
+  clearSession();
+  try {
+    (remember ? localStorage : sessionStorage).setItem(TOKEN_KEY, token);
+  } catch {}
+}
