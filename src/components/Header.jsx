@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { logo } from '../assets/images'
 import { desktopNavLinks, mobileNavLinks } from '../data/content'
 import { useDismiss } from '../hooks/useDismiss'
+import { isAuthed } from '../auth.js'
 import LanguageMenu from './LanguageMenu'
 import ThemeToggle from './ThemeToggle'
 
@@ -15,6 +17,7 @@ export default function Header({ isDark, onToggleTheme }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef(null)
   const menuBtnRef = useRef(null)
+  const authed = isAuthed()
 
   const closeMenu = useCallback(() => setMenuOpen(false), [])
 
@@ -39,7 +42,7 @@ export default function Header({ isDark, onToggleTheme }) {
       <div className="nav-glow" aria-hidden="true"></div>
 
       {/* 1. الشعار على أقصى اليمين تماماً */}
-      <a href="/" className="flex flex-1 basis-0 items-center justify-end gap-2">
+      <Link to="/" className="flex flex-1 basis-0 items-center justify-end gap-2">
         <div className="text-blue-600 dark:text-blue-400 font-extrabold text-2xl tracking-wider flex items-center gap-4">
           <img
             src={logo}
@@ -47,7 +50,7 @@ export default function Header({ isDark, onToggleTheme }) {
             className="w-[130px] sm:w-[160px] lg:w-[196px] aspect-[196/100] object-contain select-none"
           />
         </div>
-      </a>
+      </Link>
 
       {/* 2. القائمة في المنتصف */}
       <nav
@@ -79,13 +82,13 @@ export default function Header({ isDark, onToggleTheme }) {
       {/* 3. الأزرار وأيقونات اليسار */}
       <div className="flex flex-1 basis-0 items-center justify-start gap-1 sm:gap-4">
         {/* زر ابدأ الآن بتدرج من اليمين #00ADF1 إلى اليسار #0079E2 مطابق للصورة */}
-        <a
-          href="#"
+        <Link
+          to={authed ? '/dashboard' : '/login'}
           className="hidden sm:inline-block shrink-0 whitespace-nowrap text-[#000000] font-semibold px-6 py-2.5 rounded-full shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-105 hover:-translate-y-1 transition-all duration-300 text-sm cursor-pointer"
           style={startGradient}
         >
-          ابدأ الآن
-        </a>
+          {authed ? 'لوحة التحكم' : 'ابدأ الآن'}
+        </Link>
 
         <LanguageMenu />
 
@@ -151,14 +154,14 @@ export default function Header({ isDark, onToggleTheme }) {
             </li>
           ))}
         </ul>
-        <a
-          href="#"
+        <Link
+          to={authed ? '/dashboard' : '/login'}
           onClick={closeMenu}
           className="sm:hidden mt-2 block text-center text-[#000000] font-semibold px-6 py-3 rounded-full shadow-md shadow-blue-500/20 hover:shadow-blue-500/40 hover:scale-105 hover:-translate-y-0.5 transition-all duration-300 text-sm cursor-pointer"
           style={startGradient}
         >
-          ابدأ الآن
-        </a>
+          {authed ? 'لوحة التحكم' : 'ابدأ الآن'}
+        </Link>
       </div>
     </header>
   )
