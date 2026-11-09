@@ -59,9 +59,13 @@
 
 
 
+import { Link } from 'react-router-dom'
+import { isAuthed } from '../auth.js'
+
 const startGradient = { background: 'linear-gradient(135deg, #00ADF1 0%, #0079E2 100%)' }
 
 export default function Hero() {
+  const authed = isAuthed()
   return (
     <>
       <section className="w-full max-w-5xl mx-auto px-4 sm:px-8 lg:px-16 mt-10 sm:mt-16 lg:mt-14 pb-10 text-center flex flex-col items-center">
@@ -80,7 +84,7 @@ export default function Hero() {
       <section>
         <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 px-4 sm:px-8 lg:px-16 z-20 relative mb-8 sm:mb-[60px]">
           <a
-            href="#"
+            href="#about"
             className="inline-flex items-center rounded-full
               px-6 sm:px-8 py-2.5 sm:py-3
               text-sm sm:text-base font-bold text-gray-900
@@ -90,8 +94,8 @@ export default function Hero() {
             تعرف على المنصة
           </a>
 
-          <a
-            href="#"
+          <Link
+            to={authed ? '/dashboard' : '/login'}
             className="group inline-flex items-center gap-2 rounded-full
               px-6 sm:px-8 py-2.5 sm:py-3
               text-sm sm:text-base font-bold text-white
@@ -107,8 +111,8 @@ export default function Hero() {
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H5m7-7-7 7 7 7"></path>
             </svg>
-            <span className="text-[#000000]">ابدأ الآن</span>
-          </a>
+            <span className="text-[#000000]">{authed ? 'لوحة التحكم' : 'ابدأ الآن'}</span>
+          </Link>
         </div>
       </section>
     </>
