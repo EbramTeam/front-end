@@ -1,0 +1,132 @@
+================================================================================
+                      خريطة مسارات صفحات مشروع إبرام (IBRAM)
+                     Full Route & Page Documentation (.txt)
+================================================================================
+
+مشروع موحد: بوابة المستخدمين والمشتريات + لوحة تحكم المسؤولين (Admin System)
+تاريخ التحديث: 09-11-2026
+نظام التوجيه: React Router DOM v7 (SPA)
+
+--------------------------------------------------------------------------------
+1. الصفحات العامة والسياسات (Public Pages)
+--------------------------------------------------------------------------------
+المسار (Path)              | الملف (Component / Page)          | الوصف
+---------------------------+-----------------------------------+------------------------------------
+/                          | src/pages/LandingPage.jsx         | الصفحة الرئيسية للمنصة (Landing Page)
+/privacy                   | src/pages/PolicyPage.jsx          | سياسة الخصوصية
+/privacy-policy            | src/pages/PolicyPage.jsx          | سياسة الخصوصية (مسار بديل)
+/terms                     | src/pages/PolicyPage.jsx          | شروط وأحكام الاستخدام
+/terms-of-use              | src/pages/PolicyPage.jsx          | شروط وأحكام الاستخدام (مسار بديل)
+/support                   | src/components/Placeholder.jsx    | الدعم الفني والمساعدة
+/cyber-compliance          | src/components/Placeholder.jsx    | الامتثال والأمن السيبراني
+
+--------------------------------------------------------------------------------
+2. تسجيل الدخول والمصادقة (Authentication Screens)
+--------------------------------------------------------------------------------
+المسار (Path)              | الملف (Component / Page)          | الوصف
+---------------------------+-----------------------------------+------------------------------------
+/login                     | src/pages/Login.jsx               | تسجيل دخول المسؤولين (الأدمن) -> يحولك إلى /admin
+/user-login                | src/pages/UserLogin.jsx           | تسجيل دخول موظفي المشتريات -> يحولك إلى /dashboard
+/forgot-password           | src/pages/ForgotPassword.jsx      | استعادة كلمة المرور
+/reset-password            | src/pages/ResetPassword.jsx       | إعادة تعيين كلمة المرور
+/first-login-password      | src/pages/FirstLoginPassword.jsx  | تغيير كلمة المرور الإلزامية عند أول تسجيل دخول
+
+--------------------------------------------------------------------------------
+3. بوابة المشتريات والموظفين (Procurement & Employee Portal)
+--------------------------------------------------------------------------------
+المسار (Path)              | الملف (Component / Page)          | الوصف
+---------------------------+-----------------------------------+------------------------------------
+/dashboard                 | src/pages/Dashboard.jsx           | لوحة تحكم الموظف، المشتريات، وطلبات الاحتياج
+/profile                   | src/pages/Profile.jsx             | الملف الشخصي للمستخدم
+/user-profile              | src/pages/Profile.jsx             | الملف الشخصي للمستخدم (مسار بديل)
+/edit-profile              | src/pages/EditProfile.jsx         | تعديل بيانات الملف الشخصي وكلمة المرور
+/my-orders                 | src/pages/MyOrders.jsx            | قائمة طلباتي / طلبات الاحتياج والمشتريات
+/need-requests             | src/pages/MyOrders.jsx            | طلبات الاحتياج (مسار بديل لـ my-orders)
+/orders                    | src/pages/MyOrders.jsx            | قائمة الطلبات (مسار بديل)
+/new-order                 | src/pages/NewOrder.jsx            | إنشاء طلب احتياج / طلب شراء جديد
+/new-need-request          | src/pages/NewOrder.jsx            | إنشاء طلب احتياج (مسار بديل)
+/new-need                  | src/pages/NewOrder.jsx            | طلب احتياج جديد (مسار بديل)
+/dashboard/new-order       | src/pages/NewOrder.jsx            | طلب جديد من لوحة التحكم (مسار بديل)
+/new-purchase-order        | src/pages/NewOrder.jsx            | أمر شراء جديد (مسار بديل)
+/order-details             | src/pages/OrderDetails.jsx        | تفاصيل الطلب
+/orders/:id                | src/pages/OrderDetails.jsx        | تفاصيل طلب محدد بالرقم (مثال: /orders/PR-2026-0001)
+/edit-order                | src/pages/EditOrder.jsx           | تعديل طلب شراء/احتياج
+/edit-order/:id            | src/pages/EditOrder.jsx           | تعديل طلب محدد
+/orders/:id/edit           | src/pages/EditOrder.jsx           | تعديل طلب محدد (مسار بديل)
+/draft-order               | src/pages/DraftOrder.jsx          | مسودات الطلبات غير المرسلة
+/orders/PR-2026-0006       | src/pages/DraftOrder.jsx          | معاينة طلب مسودة تجريبي
+/approved-order            | src/pages/ApprovedOrder.jsx       | الطلبات المعتمدة وأوامر الشراء المؤكدة
+/approved-order/:id        | src/pages/ApprovedOrder.jsx       | تفاصيل طلب معتمد محدد
+/orders/PR-2026-0009       | src/pages/ApprovedOrder.jsx       | معاينة طلب معتمد تجريبي
+/pending-approval-order    | src/pages/PendingApprovalOrder.jsx| الطلبات المعلقة وبانتظار اعتماد الإدارة
+/rejected-orders           | src/pages/RejectedOrders.jsx      | الطلبات المرفوضة مع أسباب الرفض
+/suppliers                 | src/pages/Suppliers.jsx           | دليل الموردين المعتمدين والمصنفين
+/supplier-details          | src/pages/SupplierDetails.jsx     | صفحة تفاصيل المورد
+/suppliers/:id             | src/pages/SupplierDetails.jsx     | تفاصيل مورد محدد حسب الـ ID
+/envelopes-opened          | src/pages/EnvelopesOpened.jsx     | جلسات ونتائج فض المظاريف المالية والفنية
+/envelopes-minutes         | src/pages/EnvelopesMinutes.jsx    | محضر اجتماع لجنة فض المظاريف
+/envelopes-opened/minutes  | src/pages/EnvelopesMinutes.jsx    | محضر المظاريف (مسار بديل)
+/envelopes-report          | src/pages/EnvelopesMinutes.jsx    | تقرير فض المظاريف (مسار بديل)
+/minutes                   | src/pages/EnvelopesMinutes.jsx    | المحاضر الرسمية (مسار بديل)
+/rfq-preview               | src/pages/RfqPreview.jsx          | معاينة طلب عروض الأسعار (RFQ)
+/envelopes-opened/rfq      | src/pages/RfqPreview.jsx          | طلب الأسعار للمظاريف (مسار بديل)
+/orders/PR-2026-0001/rfq   | src/pages/RfqPreview.jsx          | طلب عروض أسعار لأمر محدد
+/rfq                       | src/pages/RfqPreview.jsx          | طلب عروض أسعار (مسار بديل)
+/offers-request            | src/pages/RfqPreview.jsx          | طلب عروض أسعار (مسار بديل)
+/request-offers            | src/pages/RfqPreview.jsx          | طلب عروض أسعار (مسار بديل)
+
+--------------------------------------------------------------------------------
+4. لوحة تحكم المسؤولين وإدارة النظام (Admin & System Management - محمية بتسجيل الدخول)
+--------------------------------------------------------------------------------
+المسار (Path)              | الملف (Component / Page)          | الوصف
+---------------------------+-----------------------------------+------------------------------------
+/admin                     | src/pages/AdminDashboard.jsx      | لوحة تحكم الأدمن العامة وإحصائيات النظام
+/admin/dashboard           | src/pages/AdminDashboard.jsx      | لوحة تحكم الأدمن (مسار بديل)
+/users                     | src/pages/Users.jsx               | جدول وإدارة مستخدمي النظام
+/users/new                 | src/pages/AddUser.jsx             | إضافة مستخدم جديد وتحديد دوره وقسمه
+/users/:id                 | src/pages/UserDetail.jsx          | تفاصيل مستخدم محدد وسجل نشاطاته
+/users/:id/permissions     | src/components/Placeholder.jsx    | تعديل صلاحيات المستخدم
+/users/:id/edit            | src/components/Placeholder.jsx    | تعديل بيانات المستخدم
+/roles                     | src/pages/Roles.jsx               | إدارة الأدوار والصلاحيات (الأدوار الوظيفية)
+/roles/new                 | src/pages/Roles.jsx               | تحويل تلقائي إلى /roles
+/roles/:key/edit           | src/components/Placeholder.jsx    | تعديل صلاحيات دور معين
+/vendors                   | src/pages/Vendors.jsx             | إدارة الموردين والشركاء التجاريين
+/vendors/new               | src/pages/VendorForm.jsx          | إضافة مورد جديد وبيانات الاتصال والاعتماد
+/vendors/:id               | src/pages/VendorDetail.jsx        | تفاصيل المورد، شهاداته وأرقام التواصل
+/vendors/:id/edit          | src/pages/VendorForm.jsx          | تعديل بيانات مورد مسجل
+/audit-log                 | src/components/Placeholder.jsx    | سجل العمليات والأمان (Audit Log)
+
+--------------------------------------------------------------------------------
+5. إدارة البيانات الأساسية (Master Data Management)
+--------------------------------------------------------------------------------
+المسار (Path)                      | الملف (Component / Page)          | الوصف
+-----------------------------------+-----------------------------------+------------------------------------
+/master-data                       | src/pages/master/MasterHub.jsx    | المركز الرئيسي للبيانات الأساسية
+/master-data/departments           | src/pages/master/MasterList.jsx   | قائمة الأقسام والإدارات
+/master-data/departments/new       | src/pages/master/MasterForm.jsx   | إضافة قسم جديد
+/master-data/departments/:id       | src/pages/master/MasterDetail.jsx | تفاصيل القسم
+/master-data/departments/:id/edit  | src/pages/master/MasterForm.jsx   | تعديل القسم
+/master-data/items                 | src/pages/master/MasterList.jsx   | قائمة الأصناف والمواد
+/master-data/items/new             | src/pages/master/MasterForm.jsx   | إضافة صنف جديد
+/master-data/items/:id             | src/pages/master/MasterDetail.jsx | تفاصيل الصنف
+/master-data/items/:id/edit        | src/pages/master/MasterForm.jsx   | تعديل الصنف
+/master-data/units                 | src/pages/master/MasterList.jsx   | قائمة وحدات القياس (قطعة، متر، كجم..)
+/master-data/units/new             | src/pages/master/MasterForm.jsx   | إضافة وحدة قياس جديدة
+/master-data/units/:id             | src/pages/master/MasterDetail.jsx | تفاصيل وحدة القياس
+/master-data/units/:id/edit        | src/pages/master/MasterForm.jsx   | تعديل وحدة القياس
+/master-data/categories            | src/pages/master/MasterList.jsx   | قائمة تصنيفات المواد والمشتريات
+/master-data/categories/new        | src/pages/master/MasterForm.jsx   | إضافة تصنيف جديد
+/master-data/categories/:id        | src/pages/master/MasterDetail.jsx | تفاصيل التصنيف
+/master-data/categories/:id/edit   | src/pages/master/MasterForm.jsx   | تعديل التصنيف
+
+--------------------------------------------------------------------------------
+6. إعدادات النظام (System Settings)
+--------------------------------------------------------------------------------
+المسار (Path)              | الملف (Component / Page)          | الوصف
+---------------------------+-----------------------------------+------------------------------------
+/settings                  | src/pages/SettingsPages.jsx       | مركز إعدادات النظام الشامل
+/settings/general          | src/pages/SettingsPages.jsx       | الإعدادات العامة للمؤسسة والمنصة
+/settings/procurement      | src/pages/SettingsPages.jsx       | سياسات وشروط وإعدادات المشتريات
+/settings/notifications    | src/pages/SettingsPages.jsx       | إعدادات التنبيهات والإشعارات البريدية
+================================================================================
+
