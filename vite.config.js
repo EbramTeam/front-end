@@ -9,7 +9,11 @@ export default defineConfig({
     port: 5173,
     // الخادم لا يسمح بطلبات localhost عبر CORS، فنمررها من Vite أثناء التطوير
     proxy: {
-      '/api': { target: 'http://ibram.apps.taqat.academy', changeOrigin: true },
+      '/api': {
+        target: 'https://ibram.apps.taqat.academy',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 })

@@ -23,8 +23,16 @@ export function extractMessage(error) {
   return firstFieldError || body?.message || NETWORK_ERROR;
 }
 
+const resolveBaseUrl = () => {
+  // أثناء التطوير المحلي، نستخدم البروكسي دائماً لتفادي قيود CORS و 405 Redirects
+  if (import.meta.env.DEV) {
+    return '/api';
+  }
+  return import.meta.env.VITE_API_URL || '/api';
+};
+
 export const http = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: resolveBaseUrl(),
   headers: { Accept: 'application/json' },
 });
 
