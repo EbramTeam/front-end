@@ -335,13 +335,15 @@ export default function Pricing() {
                   type="button"
                   style={
                     isPro
-                      ? { backgroundColor: '#ffffff', color: '#000000' }
+                      ? { backgroundColor: '#ffffff', color: '#000000', paddingTop: '1.25rem', paddingBottom: '1.25rem' }
                       : {
                           background: 'linear-gradient(90deg, #007dea 0%, #01b0f5 100%)',
                           color: '#000000',
+                          paddingTop: '1.25rem',
+                          paddingBottom: '1.25rem',
                         }
                   }
-                  className="w-full cursor-pointer rounded-full py-2.5 text-sm font-bold transition-all duration-300 hover:shadow-lg active:scale-95"
+                  className="w-full cursor-pointer  rounded-full text-sm font-bold transition-all duration-300 hover:shadow-lg active:scale-95"
                 >
                   {plan.ctaText}
                 </button>
