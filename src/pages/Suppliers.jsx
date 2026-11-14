@@ -1699,6 +1699,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { logo, shieldIcon } from '../assets/images'
 import LanguageMenu from '../components/LanguageMenu'
 import NotificationMenu from '../components/NotificationMenu'
+import { CurrentUserName, CurrentUserRole } from '../components/CurrentUser.jsx'
+import { portalNav } from '../portal-access.js'
  
 /* ==================== SVG Icons ==================== */
  
@@ -1856,7 +1858,7 @@ function SidebarContent({ onNavigate }) {
  
         {/* أزرار القائمة */}
         <nav className="space-y-[clamp(4px,0.56vh,6px)]">
-          {navItems.map(({ id, label, Icon, path }) => {
+          {portalNav(navItems).map(({ id, label, Icon, path }) => {
             const isActive = id === 'suppliers'
             return (
               <button
@@ -1901,10 +1903,10 @@ function SidebarContent({ onNavigate }) {
             <i className="fa-solid fa-circle-user text-[24px] leading-none text-slate-900 dark:text-slate-200 shrink-0"></i>
             <div className="flex flex-col gap-[7px] text-right">
               <h4 className="text-[15px] 2xl:text-[17px] font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-                د. محمد كسبة
+                <CurrentUserName />
               </h4>
               <p className="text-[13px] 2xl:text-sm text-slate-500 dark:text-slate-400">
-                مدير النظام العام
+                <CurrentUserRole />
               </p>
             </div>
           </div>

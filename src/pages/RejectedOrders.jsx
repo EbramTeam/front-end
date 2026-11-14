@@ -169,7 +169,7 @@
 //           <div className="flex items-center gap-4">
 //             <img
 //               src={userHani}
-//               alt="م. هاني وشاح"
+//               alt=""
 //               className="w-10 h-10 rounded-full object-cover"
 //             />
 //             <div className="text-right">
@@ -872,7 +872,7 @@
 //             <img
 //               src={userHani}
 //               onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/user-hani.jpg'; }}
-//               alt="م. هاني وشاح"
+//               alt=""
 //               className="w-10 h-10 rounded-full object-cover"
 //             />
 //             <div className="text-right">
@@ -1382,6 +1382,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { logo, userHani, shieldIcon, calendarClock } from '../assets/images'
 import LanguageMenu from '../components/LanguageMenu'
 import NotificationMenu from '../components/NotificationMenu'
+import { CurrentUserName, CurrentUserRole } from '../components/CurrentUser.jsx'
+import { portalNav } from '../portal-access.js'
  
 /* ==================== الأيقونات (SVG) ==================== */
  
@@ -1522,7 +1524,7 @@ function SidebarContent({ onNavigate }) {
  
         {/* أزرار القائمة */}
         <nav className="space-y-2">
-          {navItems.map(({ id, label, Icon, ActiveIcon, path }) => {
+          {portalNav(navItems).map(({ id, label, Icon, ActiveIcon, path }) => {
             const isActive = id === 'my-orders'
             const CurrentIcon = isActive && ActiveIcon ? ActiveIcon : Icon
             return (
@@ -1568,15 +1570,15 @@ function SidebarContent({ onNavigate }) {
             <img
               src={userHani}
               onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/user-hani.jpg'; }}
-              alt="م. هاني وشاح"
+              alt=""
               className="w-10 h-10 rounded-full object-cover"
             />
             <div className="text-right">
               <h4 className="text-[15px] 2xl:text-[17px] font-bold text-[#000000] dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-                م. هاني وشاح
+                <CurrentUserName />
               </h4>
               <p className="text-[13px] 2xl:text-sm text-slate-500 dark:text-slate-400">
-                الإدارة الطالبة
+                <CurrentUserRole />
               </p>
             </div>
           </div>

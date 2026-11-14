@@ -105,7 +105,7 @@
 //         </div>
 //         <div className="flex items-center justify-between py-[clamp(10px,1.85vh,20px)] pr-6 2xl:pr-10 pl-5 2xl:pl-7 mt-[clamp(0px,3vh,32px)] mb-2 cursor-pointer group">
 //           <div className="flex items-center gap-4">
-//             <img src={userHani} alt="م. هاني وشاح" className="w-10 h-10 rounded-full object-cover" />
+//             <img src={userHani} alt="" className="w-10 h-10 rounded-full object-cover" />
 //             <div className="text-right">
 //               <h4 className="text-[15px] 2xl:text-[17px] font-bold text-slate-900 dark:text-white group-hover:text-sky-600 transition-colors">م. هاني وشاح</h4>
 //               <p className="text-[13px] 2xl:text-sm text-slate-500 dark:text-slate-400">الإدارة الطالبة</p>
@@ -654,7 +654,7 @@
 //         </div>
 //         <div className="flex items-center justify-between py-[clamp(10px,1.85vh,20px)] pr-6 2xl:pr-10 pl-5 2xl:pl-7 mt-[clamp(0px,3vh,32px)] mb-2 cursor-pointer group">
 //           <div className="flex items-center gap-4">
-//             <img src={userHani} alt="م. هاني وشاح" className="w-10 h-10 rounded-full object-cover" />
+//             <img src={userHani} alt="" className="w-10 h-10 rounded-full object-cover" />
 //             <div className="text-right">
 //               <h4 className="text-[15px] 2xl:text-[17px] font-bold text-slate-900 dark:text-white group-hover:text-sky-600 transition-colors">م. هاني وشاح</h4>
 //               <p className="text-[13px] 2xl:text-sm text-slate-500 dark:text-slate-400">الإدارة الطالبة</p>
@@ -1257,7 +1257,7 @@
 //         </div>
 //         <div className="flex items-center justify-between py-[clamp(10px,1.85vh,20px)] pr-6 2xl:pr-10 pl-5 2xl:pl-7 mt-[clamp(0px,3vh,32px)] mb-2 cursor-pointer group">
 //           <div className="flex items-center gap-4">
-//             <img src={userHani} alt="م. هاني وشاح" className="w-10 h-10 rounded-full object-cover" />
+//             <img src={userHani} alt="" className="w-10 h-10 rounded-full object-cover" />
 //             <div className="text-right">
 //               <h4 className="text-[15px] 2xl:text-[17px] font-bold text-slate-900 dark:text-white group-hover:text-sky-600 transition-colors">م. هاني وشاح</h4>
 //               <p className="text-[13px] 2xl:text-sm text-slate-500 dark:text-slate-400">الإدارة الطالبة</p>
@@ -1874,7 +1874,7 @@
 //         </div>
 //         <div className="flex items-center justify-between py-[clamp(10px,1.85vh,20px)] pr-6 2xl:pr-10 pl-5 2xl:pl-7 mt-[clamp(0px,3vh,32px)] mb-2 cursor-pointer group">
 //           <div className="flex items-center gap-4">
-//             <img src={userHani} alt="م. هاني وشاح" className="w-10 h-10 rounded-full object-cover" />
+//             <img src={userHani} alt="" className="w-10 h-10 rounded-full object-cover" />
 //             <div className="text-right">
 //               <h4 className="text-[15px] 2xl:text-[17px] font-bold text-slate-900 dark:text-white group-hover:text-sky-600 transition-colors">م. هاني وشاح</h4>
 //               <p className="text-[13px] 2xl:text-sm text-slate-500 dark:text-slate-400">الإدارة الطالبة</p>
@@ -2529,7 +2529,7 @@
 //         </div>
 //         <div className="flex items-center justify-between py-[clamp(10px,1.85vh,20px)] pr-6 2xl:pr-10 pl-5 2xl:pl-7 mt-[clamp(0px,3vh,32px)] mb-2 cursor-pointer group">
 //           <div className="flex items-center gap-4">
-//             <img src={userHani} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/user-hani.jpg'; }} alt="م. هاني وشاح" className="w-10 h-10 rounded-full object-cover" />
+//             <img src={userHani} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/user-hani.jpg'; }} alt="" className="w-10 h-10 rounded-full object-cover" />
 //             <div className="text-right">
 //               <h4 className="text-[15px] 2xl:text-[17px] font-bold text-slate-900 dark:text-white group-hover:text-sky-600 transition-colors">م. هاني وشاح</h4>
 //               <p className="text-[13px] 2xl:text-sm text-slate-500 dark:text-slate-400">الإدارة الطالبة</p>
@@ -3070,6 +3070,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { logo, userHani, shieldIcon } from '../assets/images'
 import LanguageMenu from '../components/LanguageMenu'
 import NotificationMenu from '../components/NotificationMenu'
+import { CurrentUserName, CurrentUserRole } from '../components/CurrentUser.jsx'
+import { portalNav } from '../portal-access.js'
  
 /* ==================== الأيقونات ==================== */
 const strokeProps = {
@@ -3162,7 +3164,7 @@ function SidebarContent({ onNavigate }) {
           القوائم التشغيلية
         </p>
         <nav className="space-y-2">
-          {navItems.map(({ id, label, Icon, path }) => {
+          {portalNav(navItems).map(({ id, label, Icon, path }) => {
             const isActive = id === 'my-orders'
             return (
               <button
@@ -3192,10 +3194,10 @@ function SidebarContent({ onNavigate }) {
         </div>
         <div className="flex items-center justify-between py-[clamp(10px,1.85vh,20px)] pr-6 2xl:pr-10 pl-5 2xl:pl-7 mt-[clamp(0px,3vh,32px)] mb-2 cursor-pointer group">
           <div className="flex items-center gap-4">
-            <img src={userHani} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/user-hani.jpg'; }} alt="م. هاني وشاح" className="w-10 h-10 rounded-full object-cover" />
+            <img src={userHani} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/user-hani.jpg'; }} alt="" className="w-10 h-10 rounded-full object-cover" />
             <div className="text-right">
-              <h4 className="text-[15px] 2xl:text-[17px] font-bold text-slate-900 dark:text-white group-hover:text-sky-600 transition-colors">م. هاني وشاح</h4>
-              <p className="text-[13px] 2xl:text-sm text-slate-500 dark:text-slate-400">الإدارة الطالبة</p>
+              <h4 className="text-[15px] 2xl:text-[17px] font-bold text-slate-900 dark:text-white group-hover:text-sky-600 transition-colors"><CurrentUserName /></h4>
+              <p className="text-[13px] 2xl:text-sm text-slate-500 dark:text-slate-400"><CurrentUserRole /></p>
             </div>
           </div>
           <i className="fa-solid fa-angle-left text-sm text-slate-500 group-hover:text-slate-700 transition-colors" />
