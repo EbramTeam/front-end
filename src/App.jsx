@@ -211,7 +211,6 @@
 
 
 
-
 import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 
@@ -257,6 +256,7 @@ import AppLayout from './components/AppLayout.jsx'
 import Placeholder from './components/Placeholder.jsx'
 import { FullScreenLoader } from './components/Spinner.jsx'
 import { PASSWORD_CHANGE_PATH, isAdminUser, useCurrentUser } from './hooks/use-auth.js'
+import { canAccessPath, homePathFor } from './portal-access.js'
 import { MasterProvider } from './masterStore.jsx'
 import MasterHub from './pages/master/MasterHub.jsx'
 import { DepartmentsList, ItemsList, UnitsList, CategoriesList } from './pages/master/MasterList.jsx'
@@ -292,10 +292,13 @@ export function fitToDesign() {
 // يحمي الصفحات: بدون توكن يرجع لصفحة الدخول، ومع adminOnly يمنع غير مدير النظام
 function RequireAuth({ children, adminOnly = false, loginPath = '/login' }) {
   const { user, isLoading } = useCurrentUser()
+  const location = useLocation()
   if (!isAuthed()) return <Navigate to={loginPath} replace />
   if (isLoading || !user) return <FullScreenLoader />
   if (user.must_change_password) return <Navigate to={PASSWORD_CHANGE_PATH} replace />
-  if (adminOnly && !isAdminUser(user)) return <Navigate to="/dashboard" replace />
+  if (adminOnly && !isAdminUser(user)) return <Navigate to={homePathFor(user)} replace />
+  // كل صفحة بالبوابة حسب صلاحيات دور اليوزر، واللي ما إله صلاحية بيرجع لصفحته
+  if (!adminOnly && !canAccessPath(user, location.pathname)) return <Navigate to={homePathFor(user)} replace />
   return children ?? <Outlet />
 }
 

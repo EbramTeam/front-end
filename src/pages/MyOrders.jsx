@@ -128,7 +128,7 @@
 //                 e.currentTarget.onerror = null
 //                 e.currentTarget.src = '/user-hani.jpg'
 //               }}
-//               alt="م. هاني وشاح"
+//               alt=""
 //               className="w-10 h-10 rounded-full object-cover shrink-0"
 //             />
 //             <div className="text-right">
@@ -897,7 +897,7 @@
 //                 e.currentTarget.onerror = null
 //                 e.currentTarget.src = '/user-hani.jpg'
 //               }}
-//               alt="م. هاني وشاح"
+//               alt=""
 //               className="w-10 h-10 rounded-full object-cover shrink-0"
 //             />
 //             <div className="text-right">
@@ -1732,7 +1732,7 @@
 //                 e.currentTarget.onerror = null
 //                 e.currentTarget.src = '/user-hani.jpg'
 //               }}
-//               alt="م. هاني وشاح"
+//               alt=""
 //               className="w-10 h-10 rounded-full object-cover shrink-0"
 //             />
 //             <div className="text-right">
@@ -2561,7 +2561,7 @@
 //                 e.currentTarget.onerror = null
 //                 e.currentTarget.src = '/user-hani.jpg'
 //               }}
-//               alt="م. هاني وشاح"
+//               alt=""
 //               className="w-10 h-10 rounded-full object-cover shrink-0"
 //             />
 //             <div className="text-right">
@@ -3093,6 +3093,8 @@ import { logo, userHani, shieldIcon } from '../assets/images'
 import LanguageMenu from '../components/LanguageMenu'
 import NotificationMenu from '../components/NotificationMenu'
 import NewNeedRequestModal from '../components/NewNeedRequestModal'
+import { CurrentUserName, CurrentUserRole } from '../components/CurrentUser.jsx'
+import { portalNav } from '../portal-access.js'
 
 /* ==================== الأيقونات (SVG) ==================== */
 
@@ -3335,7 +3337,7 @@ function SidebarContent({ activeTab, setActiveTab, onNavigate }) {
 
         {/* أزرار القائمة */}
         <nav className="space-y-2">
-          {navItems.map(({ id, label, Icon, ActiveIcon, route }) => {
+          {portalNav(navItems).map(({ id, label, Icon, ActiveIcon, route }) => {
             const isActive = activeTab === id
             const CurrentIcon = isActive ? ActiveIcon : Icon
             return (
@@ -3388,14 +3390,14 @@ function SidebarContent({ activeTab, setActiveTab, onNavigate }) {
                 e.currentTarget.onerror = null
                 e.currentTarget.src = '/user-hani.jpg'
               }}
-              alt="م. هاني وشاح"
+              alt=""
               className="w-10 h-10 rounded-full object-cover shrink-0"
             />
             <div className="text-right">
               <h4 className="text-base font-bold text-black dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-                م. هاني وشاح
+                <CurrentUserName />
               </h4>
-              <p className="text-sm text-[#565e74] dark:text-slate-400">الإدارة الطالبة</p>
+              <p className="text-sm text-[#565e74] dark:text-slate-400"><CurrentUserRole /></p>
             </div>
           </div>
           <i className="fa-solid fa-angle-left text-sm text-slate-800 dark:text-slate-300 group-hover:-translate-x-1 transition-transform"></i>

@@ -95,13 +95,14 @@
 
 // 
 
-
 import { useCallback } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { AuthService } from '../api/auth.js';
 import { clearSession, isAuthed, setSession } from '../auth.js';
 import { useNotify } from './use-notify.js';
+import { homePathFor, isAdminUser, permissionsOf } from '../portal-access.js';
+export { ADMIN_ROLE, homePathFor, isAdminUser } from '../portal-access.js';
 
 const LOGIN_ERRORS = {
   401: 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
@@ -116,17 +117,7 @@ const PASSWORD_ERRORS = {
   password: 'يجب أن تختلف كلمة المرور الجديدة عن المؤقتة وألا تتجاوز 128 خانة',
 };
 
-// ===== التوجيه حسب الدور =====
-// اسم دور مدير النظام في الباك إند (RoleSeeder)
-export const ADMIN_ROLE = 'admin';
-export const ADMIN_HOME = '/admin';
-export const USER_HOME = '/dashboard';
-
-// هل اليوزر أدمن؟ الدور بيجي من رد /login و /me
-export const isAdminUser = (user) => Boolean(user?.roles?.some((role) => role.name === ADMIN_ROLE));
-
-// وين يروح بعد الدخول: الأدمن لصفحات الأدمن، والباقي للبوابة العادية
-export const homePathFor = (user) => (isAdminUser(user) ? ADMIN_HOME : USER_HOME);
+// المنطق كله بـ portal-access.js: الأدمن لصفحات الأدمن، وكل دور للصفحة الخاصة فيه
 
 // صفحة الدخول المناسبة حسب المكان اللي كان فيه اليوزر
 const ADMIN_PREFIXES = ['/admin', '/users', '/roles', '/vendors', '/master-data', '/settings', '/audit-log'];
@@ -202,13 +193,7 @@ export function useCurrentUser() {
   });
 
   // الباك إند صار يرجّع قائمة جاهزة user.permissions، ولو مش موجودة نحسبها من الأدوار
-  const hasPermission = useCallback(
-    (name) =>
-      Array.isArray(user?.permissions)
-        ? user.permissions.includes(name)
-        : Boolean(user?.roles?.some((role) => role.permissions?.some((permission) => permission.name === name))),
-    [user]
-  );
+  const hasPermission = useCallback((name) => permissionsOf(user).includes(name), [user]);
 
   return { user, isLoading, hasPermission, isAdmin: isAdminUser(user) };
 }

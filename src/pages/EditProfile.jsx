@@ -1894,6 +1894,8 @@ import { logo, shieldIcon, userKasba } from '../assets/images'
 import LanguageMenu from '../components/LanguageMenu'
 import NotificationMenu from '../components/NotificationMenu'
 import NewNeedRequestModal from '../components/NewNeedRequestModal'
+import { CurrentUserName, CurrentUserRole } from '../components/CurrentUser.jsx'
+import { portalNav } from '../portal-access.js'
  
 /* ==================== SVG Icons ==================== */
  
@@ -2128,7 +2130,7 @@ function SidebarContent({ onNavigate, onOpenNewNeed }) {
         </p>
  
         <nav className="space-y-[clamp(6px,0.74vh,8px)]">
-          {navItems.map(({ id, label, Icon, path, isModal }) => (
+          {portalNav(navItems).map(({ id, label, Icon, path, isModal }) => (
             <button
               key={id}
               type="button"
@@ -2175,10 +2177,10 @@ function SidebarContent({ onNavigate, onOpenNewNeed }) {
             <i className="fa-solid fa-circle-user text-[24px] leading-none text-black dark:text-white shrink-0" />
             <div className="flex flex-col gap-1.5 text-right">
               <h4 className="text-[length:clamp(14px,1.67vh,18px)] font-bold text-black dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-                د. محمد كسبة
+                <CurrentUserName />
               </h4>
               <p className="text-[length:clamp(12px,1.4vh,15px)] text-[#707070] dark:text-slate-400">
-                مدير النظام العام
+                <CurrentUserRole />
               </p>
             </div>
           </div>
