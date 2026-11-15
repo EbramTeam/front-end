@@ -197,3 +197,48 @@ export function useCurrentUser() {
 
   return { user, isLoading, hasPermission, isAdmin: isAdminUser(user) };
 }
+// ===== نسيت كلمة المرور =====
+const FORGOT_ERRORS = {
+  422: 'البريد الإلكتروني غير صحيح',
+  429: 'طلبات كثيرة، حاول بعد دقيقة',
+};
+
+export function useForgotPassword() {
+  const { showError } = useNotify();
+
+  const mutation = useMutation({
+    mutationFn: (email) => AuthService.forgotPassword(email),
+    meta: { globalLoader: false },
+    onError: (error) => showError(FORGOT_ERRORS[error.status] ?? error.message),
+  });
+
+  return { sendLink: mutation.mutate, isSending: mutation.isPending, isSent: mutation.isSuccess };
+}
+
+// ===== تعيين كلمة مرور جديدة من رابط الإيميل =====
+const RESET_ERRORS = {
+  token: 'رابط إعادة التعيين غير صالح أو منتهي الصلاحية، اطلب رابطاً جديداً',
+  email: 'البريد الإلكتروني في الرابط غير صحيح، اطلب رابطاً جديداً',
+  password: 'كلمة المرور يجب أن تكون 8 خانات على الأقل وألا تتجاوز 128 خانة',
+};
+
+export function useResetPassword() {
+  const navigate = useNavigate();
+  const { showSuccess, showError } = useNotify();
+
+  const mutation = useMutation({
+    mutationFn: AuthService.resetPassword,
+    meta: { globalLoader: false },
+    onSuccess: () => {
+      showSuccess('تم تغيير كلمة المرور، سجّل دخولك بكلمة المرور الجديدة');
+      navigate('/user-login', { replace: true });
+    },
+    onError: (error) => {
+      if (error.status === 429) return showError('محاولات كثيرة، حاول بعد دقيقة');
+      const field = Object.keys(error.errors ?? {})[0];
+      showError(RESET_ERRORS[field] ?? error.message);
+    },
+  });
+
+  return { resetPassword: mutation.mutate, isSaving: mutation.isPending };
+}
