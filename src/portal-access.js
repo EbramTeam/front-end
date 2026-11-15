@@ -1,7 +1,7 @@
 // صلاحيات بوابة الموظف: مين يشوف أي صفحة، ووين يروح بعد الدخول، وشو يظهر بالقائمة الجانبية.
 // مبني على صلاحيات الباك إند (RoleSeeder) مش على أسماء الأدوار، فبيشتغل حتى لو اليوزر إله أكثر من دور.
 import { queryClient } from './lib/query-client.js';
-import { CalendarIcon, ClipboardCheckIcon, EnvelopeOpenIcon, ListIcon } from './components/PortalNavIcons.jsx';
+import { CalendarIcon, EnvelopeOpenIcon, ListIcon } from './components/PortalNavIcons.jsx';
 
 export const ADMIN_ROLE = 'admin';
 const CURRENT_USER_KEY = ['auth', 'me'];
@@ -38,7 +38,7 @@ export function homePathFor(user) {
   if (isAdminUser(user)) return '/admin';
   if (can(user, ...P.createRequest)) return '/dashboard'; // الإدارة الطالبة
   if (can(user, ...P.envelopes, ...P.rfq)) return '/envelopes-opened'; // موظف المشتريات
-  if (can(user, ...P.decide)) return '/pending-approval-order'; // مدير الإدارة، المالية، جهة الاعتماد
+  if (can(user, ...P.decide)) return '/my-orders'; // مدير الإدارة، المالية، جهة الاعتماد
   if (can(user, ...P.minutes)) return '/envelopes-minutes'; // جهة اعتماد المحاضر
   return '/dashboard';
 }
@@ -50,12 +50,11 @@ const ROUTE_RULES = [
   [/^\/dashboard$/, P.createRequest],
   // إنشاء وتعديل الطلبات
   [/^\/(new-order|new-need-request|new-need|new-purchase-order|dashboard\/new-order)$/, P.createRequest],
-  [/^\/(edit-order(\/[^/]+)?|orders\/[^/]+\/edit|draft-order)$/, P.editRequest],
+  [/^\/draft-order$/, P.editRequest],
   // RFQ وعروض الأسعار (قبل قاعدة /orders/:id العامة)
   [/^\/(rfq-preview|rfq|offers-request|request-offers|envelopes-opened\/rfq|orders\/[^/]+\/rfq)$/, P.rfq],
   // عرض الطلبات وحالاتها
   [/^\/(my-orders|need-requests|orders|order-details|approved-order(\/[^/]+)?|rejected-orders|orders\/[^/]+)$/, P.viewRequests],
-  [/^\/pending-approval-order$/, [...P.decide, ...P.viewRequests]],
   // الموردين
   [/^\/(suppliers(\/[^/]+)?|supplier-details)$/, P.suppliers],
   // فتح المظاريف والمحاضر
@@ -75,7 +74,6 @@ const currentUser = () => queryClient.getQueryData(CURRENT_USER_KEY);
 
 // عناصر حسب الدور، بتنضاف للقائمة الموجودة بكل صفحة إذا اليوزر عنده صلاحيتها
 const EXTRA_ITEMS = [
-  { id: 'pending-approval', label: 'طلبات بانتظار قرارك', Icon: ClipboardCheckIcon, to: '/pending-approval-order', perms: P.decide },
   { id: 'all-requests', label: 'طلبات الشراء', Icon: ListIcon, to: '/my-orders', perms: P.viewRequests, hideIf: P.createRequest },
   { id: 'rfq', label: 'طلبات عروض الأسعار', Icon: ListIcon, to: '/rfq-preview', perms: P.rfq },
   { id: 'envelopes', label: 'فتح المظاريف', Icon: EnvelopeOpenIcon, to: '/envelopes-opened', perms: P.envelopes },

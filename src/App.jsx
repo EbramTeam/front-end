@@ -9,10 +9,8 @@
 //   NewOrder,
 //   MyOrders,
 //   OrderDetails,
-//   EditOrder,
 //   EnvelopesOpened,
 //   RejectedOrders,
-//   PendingApprovalOrder,
 //   DraftOrder,
 //   ApprovedOrder,
 //   Suppliers,
@@ -117,12 +115,8 @@
 //         <Route path="/approved-order/:id" element={<ApprovedOrder />} />
 //         <Route path="/orders/PR-2026-0006" element={<DraftOrder />} />
 //         <Route path="/orders/PR-2026-0009" element={<ApprovedOrder />} />
-//         <Route path="/pending-approval-order" element={<PendingApprovalOrder />} />
 //         <Route path="/orders/:id" element={<OrderDetails />} />
 //         <Route path="/order-details" element={<OrderDetails />} />
-//         <Route path="/edit-order" element={<EditOrder />} />
-//         <Route path="/edit-order/:id" element={<EditOrder />} />
-//         <Route path="/orders/:id/edit" element={<EditOrder />} />
 //         <Route path="/new-order" element={<NewOrder />} />
 //         <Route path="/new-need-request" element={<NewOrder />} />
 //         <Route path="/new-need" element={<NewOrder />} />
@@ -222,10 +216,8 @@ import {
   NewOrder,
   MyOrders,
   OrderDetails,
-  EditOrder,
   EnvelopesOpened,
   RejectedOrders,
-  PendingApprovalOrder,
   DraftOrder,
   ApprovedOrder,
   Suppliers,
@@ -337,12 +329,8 @@ export default function App() {
           <Route path="/approved-order/:id" element={<ApprovedOrder />} />
           <Route path="/orders/PR-2026-0006" element={<DraftOrder />} />
           <Route path="/orders/PR-2026-0009" element={<ApprovedOrder />} />
-          <Route path="/pending-approval-order" element={<PendingApprovalOrder />} />
           <Route path="/orders/:id" element={<OrderDetails />} />
           <Route path="/order-details" element={<OrderDetails />} />
-          <Route path="/edit-order" element={<EditOrder />} />
-          <Route path="/edit-order/:id" element={<EditOrder />} />
-          <Route path="/orders/:id/edit" element={<EditOrder />} />
           <Route path="/new-order" element={<NewOrder />} />
           <Route path="/new-need-request" element={<NewOrder />} />
           <Route path="/new-need" element={<NewOrder />} />

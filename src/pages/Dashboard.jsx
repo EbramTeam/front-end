@@ -1,15 +1,14 @@
-
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { logo, userHani, shieldIcon } from '../assets/images'
 import LanguageMenu from '../components/LanguageMenu'
 import NotificationMenu from '../components/NotificationMenu'
 import NewNeedRequestModal from '../components/NewNeedRequestModal'
 import { CurrentUserName, CurrentUserRole } from '../components/CurrentUser.jsx'
 import { portalNav } from '../portal-access.js'
- 
+
 /* ==================== حركات البطاقات (CSS) ==================== */
- 
+
 const cardAnimationsCss = `
 @keyframes ibram-card-in {
   from { opacity: 0; transform: translateY(28px) scale(.95); }
@@ -24,7 +23,7 @@ const cardAnimationsCss = `
   from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }
 }
- 
+
 .stat-card {
   position: relative;
   overflow: hidden;
@@ -65,7 +64,7 @@ const cardAnimationsCss = `
 .stat-card:hover::after { left: 140%; }
 .stat-card:hover::before { width: 100%; }
 .stat-card:active { transform: translateY(-3px) scale(.98); }
- 
+
 .stat-icon {
   animation: ibram-icon-pop .7s cubic-bezier(.34,1.56,.64,1) backwards;
   animation-delay: calc(var(--i) * 110ms + 250ms);
@@ -76,15 +75,15 @@ const cardAnimationsCss = `
 .stat-card[data-id="under-review"]:hover .stat-icon { transform: scale(1.15) rotate(180deg); }
 /* علامة الصح تنبض */
 .stat-card[data-id="approved-bidding"]:hover .stat-icon { transform: scale(1.25) rotate(0); }
- 
+
 .stat-count { transition: transform .35s ease, color .35s ease; font-variant-numeric: tabular-nums; }
 .stat-card:hover .stat-count { transform: scale(1.08); color: var(--accent); }
- 
+
 .section-in {
   animation: ibram-section-in .7s cubic-bezier(.22,1,.36,1) backwards;
   animation-delay: var(--d, 0ms);
 }
- 
+
 @keyframes ibram-menu-in {
   from { opacity: 0; transform: translateY(-8px) scale(.97); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
@@ -95,18 +94,18 @@ const cardAnimationsCss = `
 }
 .menu-pop { transform-origin: top right; animation: ibram-menu-in .18s ease-out; }
 .chip-in  { animation: ibram-chip-in .25s cubic-bezier(.34,1.56,.64,1); }
- 
+
 @media (prefers-reduced-motion: reduce) {
   .menu-pop, .chip-in { animation: none !important; }
   .stat-card, .stat-icon, .section-in { animation: none !important; }
   .stat-card, .stat-card:hover, .stat-icon, .stat-count { transition: none !important; transform: none !important; }
 }
 `
- 
+
 /* عدّاد يعدّ من 0 إلى الرقم */
 function CountUp({ value, duration = 1300, delay = 0 }) {
   const [n, setN] = useState(0)
- 
+
   useEffect(() => {
     const reduce =
       typeof window !== 'undefined' &&
@@ -133,12 +132,12 @@ function CountUp({ value, duration = 1300, delay = 0 }) {
       cancelAnimationFrame(raf)
     }
   }, [value, duration, delay])
- 
+
   return <span>{n}</span>
 }
- 
+
 /* ==================== الأيقونات (SVG) ==================== */
- 
+
 const strokeProps = {
   viewBox: '0 0 24 24',
   fill: 'none',
@@ -148,7 +147,7 @@ const strokeProps = {
   strokeLinejoin: 'round',
   'aria-hidden': true,
 }
- 
+
 // الرئيسية
 const DashboardGridIcon = (props) => (
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
@@ -158,7 +157,7 @@ const DashboardGridIcon = (props) => (
     <rect x="13" y="13" width="8" height="8" rx="1.5" />
   </svg>
 )
- 
+
 // طلب إحتياج
 const NeedRequestIcon = (props) => (
   <svg {...strokeProps} {...props}>
@@ -166,7 +165,7 @@ const NeedRequestIcon = (props) => (
     <path d="M14 2v5h5" />
   </svg>
 )
- 
+
 // البحث (خطّ رفيع)
 const SearchIcon = (props) => (
   <svg {...strokeProps} strokeWidth={1.5} {...props}>
@@ -174,7 +173,7 @@ const SearchIcon = (props) => (
     <path d="m20.5 20.5-4-4" />
   </svg>
 )
- 
+
 // أيقونات بطاقات الإحصائيات
 const ClipboardCheckIcon = (props) => (
   <svg {...strokeProps} {...props}>
@@ -183,7 +182,7 @@ const ClipboardCheckIcon = (props) => (
     <path d="m9 14 2 2 4-4" />
   </svg>
 )
- 
+
 const HourglassIcon = (props) => (
   <svg {...strokeProps} {...props}>
     <path d="M5 22h14" />
@@ -192,21 +191,21 @@ const HourglassIcon = (props) => (
     <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" />
   </svg>
 )
- 
+
 const CheckCircleIcon = (props) => (
   <svg {...strokeProps} {...props}>
     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
     <polyline points="22 4 12 14.01 9 11.01" />
   </svg>
 )
- 
+
 const DocumentIcon = (props) => (
   <svg {...strokeProps} {...props}>
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
     <polyline points="14 2 14 8 20 8" />
   </svg>
 )
- 
+
 // أيقونات الترقيم
 const pagerProps = { ...strokeProps, strokeWidth: 1.75, className: 'w-4 h-4' }
 const PagerBarLeft = () => (
@@ -231,67 +230,81 @@ const PagerRight = () => (
     <path d="m10 7 5 5-5 5" />
   </svg>
 )
- 
+
 const navItems = [
   { id: 'home', label: 'الرئيسية', Icon: DashboardGridIcon, route: '/dashboard' },
   { id: 'need-requests', label: 'طلب إحتياج', Icon: NeedRequestIcon, route: '/my-orders' },
 ]
- 
+
+// ألوان حالات الطلب (مطابقة للتصميم)
 const statusStyles = {
   approved: {
-    wrap: 'bg-[#e6f8ee] text-[#16a34a] dark:bg-emerald-500/15 dark:text-emerald-400',
-    dot: 'bg-[#16a34a] dark:bg-emerald-400',
+    style: { backgroundColor: '#eefff8', color: '#34c759' },
+    dotStyle: { backgroundColor: '#34c759' },
+    wrap: 'bg-[#eefff8] text-[#34c759] dark:bg-emerald-500/15 dark:text-emerald-400',
+    dot: 'bg-[#34c759] dark:bg-emerald-400',
   },
   'in-review': {
-    wrap: 'bg-[#fff3e6] text-[#f97316] dark:bg-orange-500/15 dark:text-orange-400',
+    style: { backgroundColor: '#fffbed', color: '#f97316' },
+    dotStyle: { backgroundColor: '#f97316' },
+    wrap: 'bg-[#fffbed] text-[#f97316] dark:bg-orange-500/15 dark:text-orange-400',
     dot: 'bg-[#f97316] dark:bg-orange-400',
   },
   draft: {
-    wrap: 'bg-[#efefef] text-[#555] dark:bg-slate-500/20 dark:text-slate-300',
-    dot: 'bg-[#555] dark:bg-slate-300',
+    style: { backgroundColor: '#ededed', color: '#5e5e5e' },
+    dotStyle: { backgroundColor: '#5e5e5e' },
+    wrap: 'bg-[#ededed] text-[#5e5e5e] dark:bg-slate-500/20 dark:text-slate-300',
+    dot: 'bg-[#5e5e5e] dark:bg-slate-300',
   },
 }
- 
+
 // خيارات القائمة المنسدلة: حالة الطلب
 const statusOptions = [
-  { id: 'all', label: 'الكل عدا المحذوفين', dot: 'bg-sky-500' },
-  { id: 'approved', label: 'معتمد', dot: 'bg-[#16a34a]' },
-  { id: 'in-review', label: 'تحت التدقيق', dot: 'bg-[#f97316]' },
-  { id: 'draft', label: 'مسودة', dot: 'bg-[#555]' },
-  { id: 'deleted', label: 'محذوف', dot: 'bg-red-500' },
+  { id: 'all', label: 'الكل عدا المحذوفين', dot: 'bg-sky-500', color: '#0284c7' },
+  { id: 'approved', label: 'معتمد', dot: 'bg-[#34c759]', color: '#34c759' },
+  { id: 'in-review', label: 'تحت التدقيق', dot: 'bg-[#f97316]', color: '#f97316' },
+  { id: 'draft', label: 'مسودة', dot: 'bg-[#5e5e5e]', color: '#5e5e5e' },
+  { id: 'deleted', label: 'محذوف', dot: 'bg-red-500', color: '#ef4444' },
 ]
- 
+
 /* ==================== محتوى القائمة الجانبية (Sidebar) ==================== */
- 
+
 function SidebarContent({ activeTab, setActiveTab, onNavigate }) {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const navList = portalNav(navItems)
+  // الزر الفعّال يتحدد من الرابط الحالي، وإذا ما تطابق أي رابط نرجع لقيمة activeTab
+  const matched = navList.find(
+    ({ route }) => pathname === route || pathname.startsWith(`${route}/`)
+  )
+  const currentId = matched ? matched.id : activeTab
   return (
     <div className="min-h-full flex flex-col bg-white dark:bg-[#0b1b2d] pr-[clamp(16px,2.08vw,40px)]">
       {/* الجزء العلوي */}
-      <div className="pl-4 pt-[clamp(20px,3vh,32px)]">
+      <div className="pl-4 pt-8">
         {/* الشعار + اسم المنصة */}
         <div className="pr-6">
           <Link to="/" onClick={onNavigate} className="inline-block">
             <img
               src={logo}
               alt="IBRAM إبرام للمشتريات"
-              className="h-[clamp(100px,4.7vh,52px)] w-auto object-contain"
+              className="h-[100px] w-[200px] object-contain"
             />
           </Link>
-          <p className="mt-2 text-base text-slate-600 dark:text-slate-400 font-semibold">
+          <p className="mt-2 text-base text-[#565e74] dark:text-slate-400 font-semibold">
             إبرام للمشتريات
           </p>
         </div>
- 
+
         {/* عنوان التصنيف */}
-        <p className="pr-6 mt-[clamp(40px,6.5vh,64px)] mb-[clamp(28px,4.3vh,44px)] text-[15px] text-slate-500 dark:text-slate-500 font-medium">
+        <p className="pr-6 mt-12 mb-12 text-[15px] text-[#565e74] dark:text-slate-500 font-medium">
           القوائم التشغيلية
         </p>
- 
+
         {/* أزرار القائمة */}
         <nav className="space-y-2">
-          {portalNav(navItems).map(({ id, label, Icon, route }) => {
-            const isActive = activeTab === id
+          {navList.map(({ id, label, Icon, route }) => {
+            const isActive = currentId === id
             return (
               <button
                 key={id}
@@ -300,10 +313,15 @@ function SidebarContent({ activeTab, setActiveTab, onNavigate }) {
                   navigate(route)
                   onNavigate?.()
                 }}
-                className={`w-full h-[clamp(52px,5.8vh,62px)] flex items-center gap-3 px-6 rounded-lg text-xl font-medium text-right cursor-pointer transition-all ${
+                style={
                   isActive
-                    ? 'bg-[#01B0F5] text-slate-900 shadow-sm'
-                    : 'bg-[#f5f5f5] dark:bg-[#0f243a] text-slate-900 dark:text-slate-200 hover:bg-[#ebebeb] dark:hover:bg-[#142e4a]'
+                    ? { backgroundColor: '#00B4F0', color: '#000000' }
+                    : { backgroundColor: '#f4f4f4', color: '#000000' }
+                }
+                className={`w-full h-[62px] flex items-center gap-3 px-6 rounded-lg text-xl font-medium text-right cursor-pointer transition-all ${
+                  isActive
+                    ? 'bg-[#00B4F0] text-black shadow-sm'
+                    : 'bg-[#f4f4f4] dark:bg-[#0f243a] text-black dark:text-slate-200 hover:bg-[#ebebeb] dark:hover:bg-[#142e4a]'
                 }`}
               >
                 <Icon className="w-[22px] h-[22px] shrink-0" />
@@ -313,23 +331,23 @@ function SidebarContent({ activeTab, setActiveTab, onNavigate }) {
           })}
         </nav>
       </div>
- 
+
       {/* الجزء السفلي */}
       <div className="mt-auto pt-6">
         {/* بطاقة: النظام متصل وآمن */}
-        <div className="flex items-center gap-2 h-[86px] pr-10 pl-12 bg-[#e9f4fb] dark:bg-[#0e2740]">
+        <div className="flex items-center gap-2 h-[86px] px-[clamp(16px,calc(4.33vw-43px),40px)] bg-[#e8f6ff] dark:bg-[#0e2740]">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-800 flex-shrink-0 animate-pulse"></span>
-          <div className="flex flex-col text-right flex-1">
-            <span className="whitespace-nowrap text-base font-bold text-slate-900 dark:text-white">
+          <div className="flex flex-col text-right flex-1 min-w-0">
+            <span className="whitespace-nowrap text-[clamp(13px,0.89vw,16px)] font-bold text-black dark:text-white">
               النظام متصل وآمن
             </span>
-            <span className="text-[13px] text-slate-500 dark:text-slate-400">
+            <span className="text-[clamp(11px,0.68vw,13px)] text-[#707070] dark:text-slate-400">
               Sovereign Core v4.2
             </span>
           </div>
           <img src={shieldIcon} alt="shield" className="w-5 h-5 object-contain flex-shrink-0" />
         </div>
- 
+
         {/* بطاقة المستخدم */}
         <div
           onClick={() => navigate('/profile')}
@@ -346,10 +364,10 @@ function SidebarContent({ activeTab, setActiveTab, onNavigate }) {
               className="w-10 h-10 rounded-full object-cover shrink-0"
             />
             <div className="text-right">
-              <h4 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+              <h4 className="text-base font-bold text-black dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                 <CurrentUserName />
               </h4>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
+              <p className="text-sm text-[#707070] dark:text-slate-400">
                 <CurrentUserRole />
               </p>
             </div>
@@ -360,9 +378,9 @@ function SidebarContent({ activeTab, setActiveTab, onNavigate }) {
     </div>
   )
 }
- 
+
 /* ==================== الصفحة الرئيسية (Dashboard) ==================== */
- 
+
 export default function Dashboard() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('home')
@@ -373,7 +391,7 @@ export default function Dashboard() {
   const [isStatusOpen, setIsStatusOpen] = useState(false)
   const [isNewNeedModalOpen, setIsNewNeedModalOpen] = useState(false)
   const statusRef = useRef(null)
- 
+
   // إغلاق القائمة المنسدلة عند الضغط خارجها أو بزر Escape
   useEffect(() => {
     if (!isStatusOpen) return undefined
@@ -394,7 +412,7 @@ export default function Dashboard() {
     { id: 'faculty', label: 'الجهة: كلية الهندسة' },
     { id: 'status', label: 'الحالة: الكل عدا المحذوفين' },
   ])
- 
+
   // بيانات بطاقات الإحصائيات العلوية
   const statsCards = [
     {
@@ -403,7 +421,8 @@ export default function Dashboard() {
       title: 'إجمالي الطلبات المسجلة',
       subtitle: '100% لكل كليات وعمادات الجامعة',
       icon: ClipboardCheckIcon,
-      iconBg: 'bg-[#e3f1fb] text-[#0369a1] dark:bg-sky-500/15 dark:text-sky-300',
+      iconStyle: { backgroundColor: '#e8f6ff', color: '#0b2a4a' },
+      iconBg: 'bg-[#e8f6ff] text-[#0b2a4a] dark:bg-sky-500/15 dark:text-sky-300',
       accent: 'rgba(3,105,161,.45)',
     },
     {
@@ -412,7 +431,8 @@ export default function Dashboard() {
       title: 'تحت المراجعة والإعتماد',
       subtitle: 'بإنتظار موافقة صاحب الصلاحية',
       icon: HourglassIcon,
-      iconBg: 'bg-[#fff3df] text-[#f59e0b] dark:bg-amber-500/15 dark:text-amber-400',
+      iconStyle: { backgroundColor: '#fffbed', color: '#ff8d28' },
+      iconBg: 'bg-[#fffbed] text-[#ff8d28] dark:bg-amber-500/15 dark:text-amber-400',
       accent: 'rgba(245,158,11,.5)',
     },
     {
@@ -421,7 +441,8 @@ export default function Dashboard() {
       title: 'معتمدة للمنافسة والطرح',
       subtitle: 'جاهزة لتجهيز كراسة الشروط',
       icon: CheckCircleIcon,
-      iconBg: 'bg-[#e4f8ec] text-[#12b76a] dark:bg-emerald-500/15 dark:text-emerald-400',
+      iconStyle: { backgroundColor: '#eefff8', color: '#34c759' },
+      iconBg: 'bg-[#eefff8] text-[#34c759] dark:bg-emerald-500/15 dark:text-emerald-400',
       accent: 'rgba(18,183,106,.5)',
     },
     {
@@ -430,11 +451,12 @@ export default function Dashboard() {
       title: 'مسودات قيد الإعداد',
       subtitle: 'بحاجة لاستكمال المواصفات الفنية',
       icon: DocumentIcon,
-      iconBg: 'bg-[#e3f1fb] text-[#0369a1] dark:bg-sky-500/15 dark:text-sky-300',
+      iconStyle: { backgroundColor: '#e8f6ff', color: '#475569' },
+      iconBg: 'bg-[#e8f6ff] text-[#475569] dark:bg-sky-500/15 dark:text-sky-300',
       accent: 'rgba(1,176,245,.5)',
     },
   ]
- 
+
   // صفوف جدول الطلبات
   const ordersList = [
     {
@@ -474,18 +496,18 @@ export default function Dashboard() {
       statusType: 'draft',
     },
   ]
- 
+
   const removeFilter = (filterId) => {
     setActiveFilters((prev) => prev.filter((f) => f.id !== filterId))
     if (filterId === 'status') setSelectedStatus('all')
   }
- 
+
   const clearAllFilters = () => {
     setActiveFilters([])
     setFilterSearch('')
     setSelectedStatus('all')
   }
- 
+
   // اختيار حالة من القائمة: تظهر/تتحدّث في "الفلاتر المطبقة" وتفلتر الجدول
   const applyStatus = (id) => {
     const opt = statusOptions.find((o) => o.id === id)
@@ -498,29 +520,29 @@ export default function Dashboard() {
         : [...prev, { id: 'status', label }]
     )
   }
- 
+
   const currentStatus = statusOptions.find((o) => o.id === selectedStatus) || statusOptions[0]
   const visibleOrders =
     selectedStatus === 'all'
       ? ordersList
       : ordersList.filter((o) => o.statusType === selectedStatus)
- 
+
   const pagerBtn =
-    'w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer'
- 
+    'w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded text-[#0b1c30] dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer'
+
   return (
     <div
       dir="rtl"
-      className="min-h-screen bg-[#f8fafc] dark:bg-[#071322] text-slate-800 dark:text-slate-100 flex flex-row transition-colors duration-200 selection:bg-sky-500 selection:text-white"
+      className="min-h-screen bg-[#f4f4f4] dark:bg-[#071322] text-slate-800 dark:text-slate-100 flex flex-row transition-colors duration-200 selection:bg-sky-500 selection:text-white"
       style={{ fontFamily: '"Montserrat Arabic", sans-serif' }}
     >
-      <style>{cardAnimationsCss}</style>
- 
+      
+
       {/* ==================== القائمة الجانبية (Desktop Sidebar) ==================== */}
-      <aside className="hidden lg:block lg:w-[clamp(260px,18.4vw,353px)] shrink-0 bg-white dark:bg-[#0b1b2d] sticky top-0 h-screen overflow-y-auto select-none z-20 border-l border-slate-100 dark:border-slate-800">
+      <aside className="hidden lg:block lg:w-[clamp(260px,18.4vw,353px)] shrink-0 bg-white dark:bg-[#0b1b2d] sticky top-0 h-screen overflow-y-auto overflow-x-hidden select-none z-20 border-l border-slate-100 dark:border-slate-800">
         <SidebarContent activeTab={activeTab} setActiveTab={setActiveTab} />
       </aside>
- 
+
       {/* ==================== محتوى الصفحة الرئيسي ==================== */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* الشريط العلوي (Top Header Bar) */}
@@ -534,18 +556,18 @@ export default function Dashboard() {
             >
               <i className="fa-solid fa-bars text-lg"></i>
             </button>
- 
-            <nav className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+
+            <nav className="flex items-center gap-2 text-[13px] sm:text-[15px] text-[#565e74] dark:text-slate-400">
               <span className="hidden sm:inline hover:text-slate-700 dark:hover:text-slate-200 transition-colors">
                 نظام إدارة المشتريات - الأزهر
               </span>
               <i className="hidden sm:inline fa-solid fa-angle-left text-[11px] text-slate-500"></i>
-              <span className="font-bold text-slate-900 dark:text-white">
+              <span className="font-bold text-[#0b1c30] dark:text-white">
                 الإدارة الطالبة
               </span>
             </nav>
           </div>
- 
+
           {/* منتصف الهيدر: شريط البحث الدائري */}
           <div className="hidden md:block relative min-w-0 md:flex-1 md:max-w-[345px] lg:flex-none lg:w-[clamp(180px,17.97vw,345px)]">
             <input
@@ -553,7 +575,7 @@ export default function Dashboard() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="بحث"
-              className="w-full h-10 bg-[#f6f6f6] dark:bg-[#0f243a] border border-slate-300 dark:border-slate-700 rounded-full pr-12 pl-4 text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-[#01B0F5] transition-colors"
+              className="w-full h-10 bg-[#f4f4f4] dark:bg-[#0f243a] border border-[#bbbbbb] dark:border-slate-700 rounded-full pr-12 pl-4 text-sm text-slate-700 dark:text-slate-200 placeholder-[#828282] focus:outline-none focus:border-[#00B4F0] transition-colors"
             />
             <button
               type="button"
@@ -563,7 +585,7 @@ export default function Dashboard() {
               <SearchIcon className="w-6 h-6" />
             </button>
           </div>
- 
+
           {/* يسار الهيدر: الإشعارات واللغة */}
           <div className="flex items-center gap-4">
             <NotificationMenu />
@@ -571,7 +593,7 @@ export default function Dashboard() {
             <LanguageMenu />
           </div>
         </header>
- 
+
         {/* محتوى الـ Dashboard */}
         <main className="w-full px-4 sm:px-6 lg:pr-6 lg:pl-[clamp(24px,4.17vw,80px)] pt-6 sm:pt-10 pb-8 sm:pb-10 space-y-5 sm:space-y-6">
           {/* ترويسة الترحيب والزر الإجرائي الرئيسي */}
@@ -582,32 +604,37 @@ export default function Dashboard() {
             {/* جهة اليمين: الترحيب والبادج والوصف */}
             <div className="text-right space-y-3">
               <div className="flex items-center gap-4 flex-wrap">
-                <h1 className="text-xl sm:text-2xl lg:text-[32px] font-extrabold text-slate-900 dark:text-white tracking-tight">
+                <h1 className="text-xl sm:text-2xl lg:text-[32px] font-extrabold text-black dark:text-white tracking-tight">
                   مرحباً، م. أحمد
                 </h1>
                 {/* بادج نظام حصر الاحتياجات الموحد */}
-                <div className="inline-flex items-center gap-2 px-3 h-8 rounded-lg bg-[#eaf6fe] dark:bg-sky-950/60 text-[#0c2b4a] dark:text-sky-300 text-xs sm:text-sm font-medium">
+                <div className="inline-flex items-center gap-2 px-3 h-8 rounded-lg bg-[#e8f6ff] dark:bg-sky-950/60 text-black dark:text-sky-300 text-xs sm:text-sm font-medium">
                   <span className="flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-[#0b5e43] dark:bg-emerald-400"></span>
-                    <span className="w-2 h-2 rounded-full bg-[#0b5e43] dark:bg-emerald-400"></span>
+                    <span className="w-2 h-2 rounded-full bg-[#00442d] dark:bg-emerald-400"></span>
+                    <span className="w-2 h-2 rounded-full bg-[#00442d] dark:bg-emerald-400"></span>
                   </span>
                   <span>نظام حصر الاحتياجات الموحد</span>
                 </div>
               </div>
-              <p className="text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+              <p className="text-sm text-[#515f74] dark:text-slate-400 font-medium leading-relaxed">
                 تابع احتياجات إدارتك واطلع على آخر تحديثات طلباتك بكل سهولة وبدون تعقيدات إدارية.
               </p>
             </div>
- 
-            {/* جهة اليسار: زر طلب إحتياج جديد */}
+
+            {/* جهة اليسار: زر طلب إحتياج جديد (تدرج: أزرق غامق يسار → سماوي يمين، نص أسود) */}
             <button
+              type="button"
               onClick={() => setIsNewNeedModalOpen(true)}
-              className="inline-flex items-center justify-center w-full sm:w-[273px] h-12 rounded-full bg-[linear-gradient(to_left,#01B0F5,#0066F0)] hover:brightness-105 hover:shadow-lg hover:shadow-sky-500/30 active:scale-[0.98] text-slate-900 font-bold text-[15px] transition-all cursor-pointer whitespace-nowrap shrink-0"
+              style={{
+                background: 'linear-gradient(90deg, #007EEA 0%, #01AEF4 100%)',
+                color: '#000000',
+              }}
+              className="inline-flex items-center justify-center w-full sm:w-[273px] h-12 rounded-full font-bold text-[15px] hover:brightness-105 hover:shadow-lg hover:shadow-sky-500/30 active:scale-[0.98] transition-all cursor-pointer whitespace-nowrap shrink-0"
             >
               <span>طلب إحتياج جديد</span>
             </button>
           </div>
- 
+
           {/* 4 بطاقات إحصائيات */}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
             {statsCards.map((card, i) => {
@@ -621,22 +648,23 @@ export default function Dashboard() {
                 >
                   {/* السطر العلوي: الرقم على اليمين والأيقونة على اليسار */}
                   <div className="flex items-center justify-between">
-                    <span className="stat-count text-[28px] 2xl:text-[32px] leading-none font-extrabold text-slate-900 dark:text-white">
+                    <span className="stat-count text-[28px] 2xl:text-[32px] leading-none font-extrabold text-black dark:text-white">
                       <CountUp value={card.count} delay={i * 110 + 200} />
                     </span>
                     <div
+                      style={card.iconStyle}
                       className={`stat-icon w-10 h-10 rounded-[10px] flex items-center justify-center ${card.iconBg}`}
                     >
                       <IconComp className="w-5 h-5" />
                     </div>
                   </div>
- 
+
                   {/* السطر السفلي: العنوان والوصف */}
                   <div className="text-right">
-                    <h3 className="text-[15px] 2xl:text-base font-bold text-slate-900 dark:text-slate-200">
+                    <h3 className="text-[15px] 2xl:text-base font-bold text-black dark:text-slate-200">
                       {card.title}
                     </h3>
-                    <p className="text-[13px] 2xl:text-sm text-slate-500 dark:text-slate-500 mt-1">
+                    <p className="text-[13px] 2xl:text-sm text-[#707070] dark:text-slate-500 mt-1">
                       {card.subtitle}
                     </p>
                   </div>
@@ -644,7 +672,7 @@ export default function Dashboard() {
               )
             })}
           </div>
- 
+
           {/* بطاقة الفلاتر والبحث */}
           <div
             className="section-in relative z-20 mt-2 sm:mt-4 bg-white dark:bg-[#0b1b2d] rounded-3xl p-4 sm:p-6 space-y-4 sm:space-y-6 shadow-[0_2px_12px_rgba(16,24,40,0.04)] dark:border dark:border-slate-800"
@@ -659,7 +687,7 @@ export default function Dashboard() {
                   value={filterSearch}
                   onChange={(e) => setFilterSearch(e.target.value)}
                   placeholder="تصفية الطلبات حسب الجهة الطالبة"
-                  className="w-full h-10 bg-[#f8f8f8] dark:bg-[#0f243a] border border-slate-300 dark:border-slate-700 rounded-full pr-12 pl-4 text-[13px] text-slate-700 dark:text-slate-200 placeholder-slate-500 focus:outline-none focus:border-[#01B0F5] transition-colors"
+                  className="w-full h-10 bg-[#f4f4f4] dark:bg-[#0f243a] border border-[#bbbbbb] dark:border-slate-700 rounded-full pr-12 pl-4 text-[13px] text-slate-700 dark:text-slate-200 placeholder-[#828282] focus:outline-none focus:border-[#00B4F0] transition-colors"
                 />
                 <button
                   type="button"
@@ -669,7 +697,7 @@ export default function Dashboard() {
                   <SearchIcon className="w-6 h-6" />
                 </button>
               </div>
- 
+
               {/* القائمة المنسدلة: حالة الطلب */}
               <div ref={statusRef} className="relative flex-1 sm:flex-none sm:w-[224px]">
                 <button
@@ -679,20 +707,20 @@ export default function Dashboard() {
                   aria-expanded={isStatusOpen}
                   className={`h-10 w-full px-4 rounded-full border flex items-center justify-between gap-2 text-sm transition-colors cursor-pointer focus:outline-none ${
                     selectedStatus !== 'all' || isStatusOpen
-                      ? 'border-[#01B0F5] bg-white dark:bg-[#0f243a] text-slate-900 dark:text-white font-medium'
-                      : 'border-slate-300 dark:border-slate-700 bg-[#f8f8f8] dark:bg-[#0f243a] text-slate-500 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-600'
+                      ? 'border-[#00B4F0] bg-white dark:bg-[#0f243a] text-black dark:text-white font-medium'
+                      : 'border-[#bbbbbb] dark:border-slate-700 bg-[#f4f4f4] dark:bg-[#0f243a] text-[#949494] dark:text-slate-300 hover:border-slate-500 dark:hover:border-slate-600'
                   }`}
                 >
                   <span className="truncate">
                     {selectedStatus === 'all' ? 'حالة الطلب' : currentStatus.label}
                   </span>
                   <i
-                    className={`fa-solid fa-angle-down text-xs text-slate-700 dark:text-slate-300 transition-transform duration-200 ${
+                    className={`fa-solid fa-angle-down text-xs text-black dark:text-slate-300 transition-transform duration-200 ${
                       isStatusOpen ? 'rotate-180' : ''
                     }`}
                   ></i>
                 </button>
- 
+
                 {isStatusOpen && (
                   <ul
                     role="listbox"
@@ -707,13 +735,16 @@ export default function Dashboard() {
                             onClick={() => applyStatus(opt.id)}
                             className={`w-full flex items-center gap-3 px-4 h-10 text-sm text-right cursor-pointer transition-colors ${
                               isSel
-                                ? 'bg-[#eaf6fe] dark:bg-[#0c2438] text-slate-900 dark:text-white font-bold'
+                                ? 'bg-[#e8f6ff] dark:bg-[#0c2438] text-black dark:text-white font-bold'
                                 : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                             }`}
                           >
-                            <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${opt.dot}`}></span>
+                            <span
+                              style={opt.color ? { backgroundColor: opt.color } : undefined}
+                              className={`w-2.5 h-2.5 rounded-full shrink-0 ${opt.dot}`}
+                            ></span>
                             <span className="flex-1">{opt.label}</span>
-                            {isSel && <i className="fa-solid fa-check text-xs text-[#0a84ff]"></i>}
+                            {isSel && <i className="fa-solid fa-check text-xs text-[#0077ff]"></i>}
                           </button>
                         </li>
                       )
@@ -721,33 +752,34 @@ export default function Dashboard() {
                   </ul>
                 )}
               </div>
- 
+
               {/* زر إعادة التعيين (Reset) */}
               <button
                 type="button"
                 onClick={clearAllFilters}
                 title="إعادة ضبط الفلاتر"
-                className="w-10 h-10 rounded-xl bg-[#e3f3fd] dark:bg-[#0f243a] text-[#0369a1] dark:text-sky-300 flex items-center justify-center hover:bg-[#d3ecfb] dark:hover:bg-[#142e4a] active:rotate-180 transition-all duration-300 cursor-pointer shrink-0"
+                style={{ backgroundColor: '#e8f6ff', color: '#000000' }}
+                className="w-10 h-10 rounded-xl bg-[#e8f6ff] dark:bg-[#0f243a] text-black dark:text-sky-300 flex items-center justify-center hover:bg-[#d6eefc] dark:hover:bg-[#142e4a] active:rotate-180 transition-all duration-300 cursor-pointer shrink-0"
               >
                 <i className="fa-solid fa-rotate-right text-sm"></i>
               </button>
             </div>
- 
+
             {/* سطر الفلاتر المطبقة */}
             <div className="flex items-center gap-2 flex-wrap text-sm min-h-[38px]">
-              <span className="text-slate-700 dark:text-slate-300 font-medium ml-1">
+              <span className="text-[#464554] dark:text-slate-300 font-medium ml-1">
                 الفلاتر المطبقة:
               </span>
               {activeFilters.map((filter) => (
                 <span
                   key={`${filter.id}-${filter.label}`}
-                  className="chip-in inline-flex items-center gap-2 px-3 h-[38px] rounded-lg bg-[#f1f5f9] dark:bg-[#0c2438] text-slate-800 dark:text-slate-200 text-sm font-medium"
+                  className="chip-in inline-flex items-center gap-2 px-3 h-[38px] rounded-lg bg-[#e8f6ff] dark:bg-[#0c2438] text-black dark:text-slate-200 text-sm font-medium"
                 >
                   <span>{filter.label}</span>
                   <button
                     onClick={() => removeFilter(filter.id)}
                     aria-label="إزالة الفلتر"
-                    className="text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer"
+                    className="text-slate-600 hover:text-black dark:hover:text-slate-200 cursor-pointer"
                   >
                     <i className="fa-regular fa-circle-xmark text-sm"></i>
                   </button>
@@ -756,14 +788,14 @@ export default function Dashboard() {
               {activeFilters.length > 0 && (
                 <button
                   onClick={clearAllFilters}
-                  className="text-[#0a84ff] font-medium hover:underline cursor-pointer mr-2"
+                  className="text-[#0077ff] font-medium hover:underline cursor-pointer mr-2"
                 >
                   مسح الكل
                 </button>
               )}
             </div>
           </div>
- 
+
           {/* جدول الطلبات */}
           <div
             className="section-in bg-white dark:bg-[#0b1b2d] rounded-3xl shadow-[0_2px_12px_rgba(16,24,40,0.04)] dark:border dark:border-slate-800 overflow-hidden"
@@ -771,32 +803,31 @@ export default function Dashboard() {
           >
             <div className="hidden xl:block">
               <table className="w-full table-fixed border-collapse text-right">
+                {/* 8 أعمدة (بدون عمود الأولوية) - المجموع 100% */}
                 <colgroup>
-                  <col style={{ width: '11%' }} />
-                  <col style={{ width: '18%' }} />
-                  <col style={{ width: '11%' }} />
-                  <col style={{ width: '11%' }} />
-                  <col style={{ width: '11%' }} />
+                  <col style={{ width: '13%' }} />
+                  <col style={{ width: '17%' }} />
                   <col style={{ width: '12%' }} />
-                  <col style={{ width: '7%' }} />
                   <col style={{ width: '12%' }} />
-                  <col style={{ width: '7%' }} />
+                  <col style={{ width: '12%' }} />
+                  <col style={{ width: '12%' }} />
+                  <col style={{ width: '12%' }} />
+                  <col style={{ width: '10%' }} />
                 </colgroup>
                 {/* ترويسة الجدول */}
                 <thead>
-                  <tr className="h-[66px] bg-[#E8F6FF] dark:bg-[#0c2438] text-slate-600 dark:text-slate-200 text-xs 2xl:text-[15px] font-medium">
+                  <tr className="h-[66px] bg-[#e8f6ff] dark:bg-[#0c2438] text-[#5e5e5e] dark:text-slate-200 text-xs 2xl:text-[15px] font-medium">
                     <th className="px-1 text-center font-medium whitespace-nowrap">رقم الطلب</th>
                     <th className="px-1 text-right font-medium whitespace-nowrap">عنوان الإحتياج والمواصفات</th>
                     <th className="px-1 text-center font-medium whitespace-nowrap">الجهة الطالبة</th>
                     <th className="px-1 text-center font-medium whitespace-nowrap">تاريخ التقديم</th>
                     <th className="px-1 text-center font-medium whitespace-nowrap">الكمية المقدرة</th>
                     <th className="px-1 text-center font-medium whitespace-nowrap">التكلفة المتوقعة</th>
-                    <th className="px-1 text-center font-medium whitespace-nowrap">الأولوية</th>
                     <th className="px-1 text-center font-medium whitespace-nowrap">حالة الإعتماد</th>
                     <th className="px-1 text-center font-medium whitespace-nowrap">الإجراءات</th>
                   </tr>
                 </thead>
- 
+
                 {/* صفوف الجدول */}
                 <tbody className="text-sm 2xl:text-[15px]">
                   {visibleOrders.map((order, idx) => {
@@ -807,69 +838,75 @@ export default function Dashboard() {
                         className="h-[103px] hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors"
                       >
                         {/* رقم الطلب */}
-                        <td className="px-2 text-center font-bold text-slate-900 dark:text-white">
+                        <td className="px-2 text-center font-bold text-black dark:text-white">
                           {order.id}
                         </td>
- 
+
                         {/* عنوان الإحتياج والمواصفات */}
                         <td className="px-2 text-right">
-                          <div className="font-bold text-slate-900 dark:text-white">
+                          <div className="font-bold text-[#0b1c30] dark:text-white">
                             {order.title}
                           </div>
-                          <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                          <div className="text-sm text-[#5e5e5e] dark:text-slate-400 mt-1">
                             {order.specs}
                           </div>
                         </td>
- 
+
                         {/* الجهة الطالبة (تلتف على سطرين) */}
-                        <td className="px-2 text-center text-slate-700 dark:text-slate-300 leading-relaxed">
+                        <td className="px-2 text-center text-[#5e5e5e] dark:text-slate-300 leading-relaxed">
                           {order.entity}
                         </td>
- 
+
                         {/* تاريخ التقديم */}
-                        <td className="px-2 text-center text-slate-700 dark:text-slate-300">
+                        <td className="px-2 text-center text-[#5e5e5e] dark:text-slate-300">
                           {order.date}
                         </td>
- 
+
                         {/* الكمية المقدرة */}
-                        <td className="px-2 text-center text-slate-700 dark:text-slate-300">
+                        <td className="px-2 text-center text-[#5e5e5e] dark:text-slate-300">
                           {order.quantity}
                         </td>
- 
+
                         {/* التكلفة المتوقعة */}
-                        <td className="px-2 text-center text-slate-700 dark:text-slate-300">
+                        <td className="px-2 text-center text-[#5e5e5e] dark:text-slate-300">
                           {order.cost}
                         </td>
- 
-                        {/* الأولوية */}
-                        <td className="px-2 text-center text-slate-400">
-                          {order.priority || ''}
-                        </td>
- 
+
                         {/* حالة الإعتماد */}
                         <td className="px-2 text-center">
-                          <span
-                            className={`inline-flex items-center gap-2 px-2 2xl:px-3 h-[30px] rounded-lg font-medium text-[13px] 2xl:text-[15px] whitespace-nowrap ${st.wrap}`}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (order.statusType === 'approved') {
+                                navigate('/approved-order')
+                              }
+                            }}
+                            className={`inline-flex items-center gap-2 px-3 h-[30px] rounded-lg font-medium text-[15px] whitespace-nowrap cursor-pointer hover:shadow-sm hover:scale-105 active:scale-95 transition-all ${st?.wrap || ''}`}
+                            title={order.statusType === 'approved' ? 'عرض تفاصيل الطلب المعتمد' : order.statusText}
                           >
-                            <span className={`w-2.5 h-2.5 rounded-full ${st.dot}`}></span>
+                            <span className={`w-2.5 h-2.5 rounded-full ${st?.dot || ''}`}></span>
                             <span>{order.statusText}</span>
-                          </span>
+                          </button>
                         </td>
- 
+
                         {/* الإجراءات */}
                         <td className="px-2 text-center">
                           <div className="flex items-center justify-center gap-3 2xl:gap-6">
                             <button
                               type="button"
-                              onClick={() => navigate('/edit-order')}
-                              className="text-slate-800 hover:text-sky-600 dark:text-slate-300 dark:hover:text-sky-400 hover:scale-110 transition-all cursor-pointer"
-                              title="عرض التفاصيل"
+                              onClick={() => {
+                                if (order.statusType === 'approved') {
+                                  navigate('/approved-order')
+                                }
+                              }}
+                              className="text-[#1a1a1a] hover:text-sky-600 dark:text-slate-300 dark:hover:text-sky-400 hover:scale-110 transition-all cursor-pointer"
+                              title={order.statusType === 'approved' ? 'عرض تفاصيل الطلب المعتمد' : 'عرض التفاصيل'}
                             >
                               <i className="fa-regular fa-eye text-xl"></i>
                             </button>
                             <button
                               type="button"
-                              className="text-slate-800 hover:text-slate-500 dark:text-slate-300 dark:hover:text-slate-100 hover:scale-110 transition-all cursor-pointer"
+                              className="text-[#1a1a1a] hover:text-slate-500 dark:text-slate-300 dark:hover:text-slate-100 hover:scale-110 transition-all cursor-pointer"
                               title="خيارات إضافية"
                             >
                               <i className="fa-solid fa-ellipsis-vertical text-xl"></i>
@@ -881,7 +918,7 @@ export default function Dashboard() {
                   })}
                   {visibleOrders.length === 0 && (
                     <tr className="h-[103px]">
-                      <td colSpan={9} className="text-center text-slate-500 dark:text-slate-400">
+                      <td colSpan={8} className="text-center text-slate-500 dark:text-slate-400">
                         لا توجد طلبات مطابقة للفلاتر المحددة
                       </td>
                     </tr>
@@ -889,10 +926,10 @@ export default function Dashboard() {
                 </tbody>
               </table>
             </div>
- 
+
             {/* ==================== قائمة البطاقات للجوال والآيباد (بدل الجدول) ==================== */}
             <div className="xl:hidden">
-              <div className="h-12 px-4 sm:px-6 flex items-center bg-[#E8F6FF] dark:bg-[#0c2438] text-sm font-medium text-slate-600 dark:text-slate-200">
+              <div className="h-12 px-4 sm:px-6 flex items-center bg-[#e8f6ff] dark:bg-[#0c2438] text-sm font-medium text-[#5e5e5e] dark:text-slate-200">
                 قائمة طلبات الإحتياج
               </div>
               {visibleOrders.map((order, idx) => {
@@ -904,25 +941,32 @@ export default function Dashboard() {
                   >
                     {/* رقم الطلب + الحالة */}
                     <div className="flex items-center justify-between gap-3">
-                      <span className="font-bold text-slate-900 dark:text-white text-sm">
+                      <span className="font-bold text-black dark:text-white text-sm">
                         {order.id}
                       </span>
-                      <span
-                        className={`inline-flex items-center gap-2 px-3 h-[30px] rounded-lg font-medium text-sm whitespace-nowrap ${st.wrap}`}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (order.statusType === 'approved') {
+                            navigate('/approved-order')
+                          }
+                        }}
+                        className={`inline-flex items-center gap-2 px-3 h-[30px] rounded-lg font-medium text-sm whitespace-nowrap cursor-pointer hover:scale-105 active:scale-95 transition-all ${st?.wrap || ''}`}
+                        title={order.statusType === 'approved' ? 'عرض تفاصيل الطلب المعتمد' : order.statusText}
                       >
-                        <span className={`w-2.5 h-2.5 rounded-full ${st.dot}`}></span>
+                        <span className={`w-2.5 h-2.5 rounded-full ${st?.dot || ''}`}></span>
                         <span>{order.statusText}</span>
-                      </span>
+                      </button>
                     </div>
- 
+
                     {/* العنوان والمواصفات */}
                     <div className="text-right">
-                      <div className="font-bold text-slate-900 dark:text-white">{order.title}</div>
-                      <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                      <div className="font-bold text-[#0b1c30] dark:text-white">{order.title}</div>
+                      <div className="text-sm text-[#5e5e5e] dark:text-slate-400 mt-1">
                         {order.specs}
                       </div>
                     </div>
- 
+
                     {/* التفاصيل */}
                     <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3 text-sm text-right">
                       {[
@@ -930,30 +974,33 @@ export default function Dashboard() {
                         ['تاريخ التقديم', order.date],
                         ['الكمية المقدرة', order.quantity],
                         ['التكلفة المتوقعة', order.cost],
-                        ...(order.priority ? [['الأولوية', order.priority]] : []),
                       ].map(([label, value]) => (
                         <div key={label}>
                           <dt className="text-xs text-slate-500 dark:text-slate-400">{label}</dt>
-                          <dd className="mt-0.5 font-medium text-slate-800 dark:text-slate-200">
+                          <dd className="mt-0.5 font-medium text-[#5e5e5e] dark:text-slate-200">
                             {value}
                           </dd>
                         </div>
                       ))}
                     </dl>
- 
+
                     {/* الإجراءات */}
                     <div className="flex items-center justify-end gap-5 pt-1">
                       <button
                         type="button"
-                        onClick={() => navigate('/edit-order')}
-                        className="text-slate-800 hover:text-sky-600 dark:text-slate-300 dark:hover:text-sky-400 cursor-pointer"
-                        title="عرض التفاصيل"
+                        onClick={() => {
+                          if (order.statusType === 'approved') {
+                            navigate('/approved-order')
+                          }
+                        }}
+                        className="text-[#1a1a1a] hover:text-sky-600 dark:text-slate-300 dark:hover:text-sky-400 hover:scale-110 transition-all cursor-pointer"
+                        title={order.statusType === 'approved' ? 'عرض تفاصيل الطلب المعتمد' : 'عرض التفاصيل'}
                       >
                         <i className="fa-regular fa-eye text-xl"></i>
                       </button>
                       <button
                         type="button"
-                        className="text-slate-800 hover:text-slate-500 dark:text-slate-300 dark:hover:text-slate-100 cursor-pointer"
+                        className="text-[#1a1a1a] hover:text-slate-500 dark:text-slate-300 dark:hover:text-slate-100 cursor-pointer"
                         title="خيارات إضافية"
                       >
                         <i className="fa-solid fa-ellipsis-vertical text-xl"></i>
@@ -968,16 +1015,16 @@ export default function Dashboard() {
                 </div>
               )}
             </div>
- 
+
             {/* ترقيم الصفحات (Pagination) أسفل الجدول */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 sm:px-6 py-4 text-sm border-t border-slate-100 dark:border-slate-800 xl:border-t-0">
               {/* اليمين: عرض 1 إلى 5 من أصل 26 */}
-              <div className="text-slate-700 dark:text-slate-400 font-medium text-center">
+              <div className="text-[#565e74] dark:text-slate-400 font-medium text-center">
                 عرض 1 إلى 5 من أصل 26 طلب إحتياج
               </div>
- 
+
               {/* اليسار: أزرار التنقل بين الصفحات */}
-              <div className="flex items-center justify-center flex-wrap gap-1 text-slate-700 dark:text-slate-400">
+              <div className="flex items-center justify-center flex-wrap gap-1 text-[#828282] dark:text-slate-400">
                 <button type="button" title="الصفحة الأولى" className={pagerBtn}>
                   <PagerBarLeft />
                 </button>
@@ -986,7 +1033,8 @@ export default function Dashboard() {
                 </button>
                 <button
                   type="button"
-                  className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded bg-[#0a84ff] text-white font-bold text-sm"
+                  style={{ backgroundColor: '#0077ff', color: '#ffffff' }}
+                  className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded bg-[#0077ff] text-white font-bold text-sm"
                 >
                   1
                 </button>
@@ -1011,7 +1059,7 @@ export default function Dashboard() {
           </div>
         </main>
       </div>
- 
+
       {/* ==================== القائمة الجانبية للشاشات الصغيرة (Mobile Drawer) ==================== */}
       <div
         className={`fixed inset-0 z-50 lg:hidden transition-all duration-300 ease-in-out ${
@@ -1024,9 +1072,9 @@ export default function Dashboard() {
           }`}
           onClick={() => setIsMobileMenuOpen(false)}
         ></div>
- 
+
         <div
-          className={`fixed top-0 right-0 w-[280px] max-w-[85vw] h-full bg-white dark:bg-[#0b1b2d] shadow-2xl z-10 overflow-y-auto select-none transition-transform duration-300 ease-in-out ${
+          className={`fixed top-0 right-0 w-[280px] max-w-[85vw] h-full bg-white dark:bg-[#0b1b2d] shadow-2xl z-10 overflow-y-auto overflow-x-hidden select-none transition-transform duration-300 ease-in-out ${
             isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
@@ -1037,7 +1085,7 @@ export default function Dashboard() {
           >
             <i className="fa-solid fa-xmark text-lg"></i>
           </button>
- 
+
           <SidebarContent
             activeTab={activeTab}
             setActiveTab={setActiveTab}
@@ -1054,7 +1102,6 @@ export default function Dashboard() {
     </div>
   )
 }
- 
 
 
 
