@@ -51,11 +51,7 @@ export default function NotificationMenu() {
       prev.map((n) => (n.id === item.id ? { ...n, unread: false } : n))
     )
     setOpen(false)
-    if (item.id === 'PR-2026-0008') {
-      navigate('/edit-order')
-    } else {
-      navigate(`/orders/${item.id}`)
-    }
+    navigate(`/orders/${item.id}`)
   }
 
   return (

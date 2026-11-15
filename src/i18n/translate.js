@@ -1,5 +1,4 @@
 import dict from './en.json';
-import { applyCss } from '../styles/loader.js';
 
 // ترجمة عبر استبدال النصوص الظاهرة: النص العربي الأصلي هو المفتاح
 const KEYS = Object.keys(dict).sort((a, b) => b.length - a.length);
@@ -117,7 +116,6 @@ export function setLanguage(code) {
   root.lang = code;
   root.dir = code === 'en' ? 'ltr' : 'rtl';
   root.classList.toggle('lang-en', code === 'en');
-  applyCss(code);
   window.dispatchEvent(new CustomEvent('ibram-lang', { detail: code }));
   if (observer) observer.disconnect();
   if (document.body) {
