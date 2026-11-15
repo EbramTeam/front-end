@@ -16,4 +16,14 @@ export const AuthService = {
   logout() {
     return api.post('/logout', undefined, { silent: true });
   },
+
+  // نسيت كلمة المرور: الباك إند بيبعت رابط بالإيميل (نفس الرد دايماً حتى لو الإيميل مش مسجّل)
+  forgotPassword(email) {
+    return api.post('/forgot-password', { email }, { silent: true });
+  },
+
+  // تعيين كلمة مرور جديدة من رابط الإيميل: { token, email, password, password_confirmation }
+  resetPassword(body) {
+    return api.post('/reset-password', body, { silent: true });
+  },
 };

@@ -1416,12 +1416,39 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { logo, shieldIcon, userKasba } from '../assets/images'
+import { logo, shieldIcon } from '../assets/images'
 import LanguageMenu from '../components/LanguageMenu'
 import NotificationMenu from '../components/NotificationMenu'
 import NewNeedRequestModal from '../components/NewNeedRequestModal'
 import { CurrentUserName, CurrentUserRole } from '../components/CurrentUser.jsx'
-import { portalNav } from '../portal-access.js'
+import { portalNav, roleLabelOf } from '../portal-access.js'
+import { useCurrentUser } from '../hooks/use-auth.js'
+
+// تاريخ بالهجري والميلادي: 1444/03/12 هـ (2022/10/08 م)
+function formatDualDate(value) {
+  if (!value) return '—'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return '—'
+  const opts = { year: 'numeric', month: '2-digit', day: '2-digit' }
+  try {
+    const hijri = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', opts).formatToParts(date)
+    const h = (type) => hijri.find((x) => x.type === type)?.value
+    const greg = new Intl.DateTimeFormat('en-GB', opts).formatToParts(date)
+    const g = (type) => greg.find((x) => x.type === type)?.value
+    return `${h('year')}/${h('month')}/${h('day')} هـ (${g('year')}/${g('month')}/${g('day')} م)`
+  } catch {
+    return date.toLocaleDateString('en-GB')
+  }
+}
+
+// آخر تسجيل دخول: 2026/11/15 09:35
+function formatDateTime(value) {
+  if (!value) return 'لم يسجّل دخول بعد'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return '—'
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
 
 /* ==================== SVG Icons ==================== */
 
@@ -1701,24 +1728,29 @@ export default function Profile() {
   const [searchVal, setSearchVal] = useState('')
   const fileInputRef = useRef(null)
 
+  // بيانات اليوزر المسجّل دخول، من /me
+  const { user } = useCurrentUser()
+  const avatarKey = `user_avatar_${user?.id ?? 'me'}`
+  const roleLabel = roleLabelOf(user) || '—'
+  const departmentName = user?.department?.name || '—'
+  const organizationName = user?.organization?.name || '—'
+
   const [avatar, setAvatar] = useState(() => {
     try {
-      return localStorage.getItem('user_avatar_kasba') || userKasba
+      return localStorage.getItem(avatarKey) || ''
     } catch {
-      return userKasba
+      return ''
     }
   })
 
-  const [formData] = useState({
-    fullName: 'د . محمد كسبة',
-    email: 't.almansoor@org.gov.sa',
-    phone: '+972 590 492 8812',
-    internalRole: 'مهندس أنظمة ومسؤول طلبات',
-    department: 'الإدارة العامة لتقنية المعلومات - قسم البنية التحتية',
-    empId: 'EMP-34190',
-    username: 't.almansoor@org.gov.sa',
+  const formData = {
+    fullName: user?.name ?? '',
+    email: user?.email ?? '',
+    department: departmentName,
+    lastLogin: formatDateTime(user?.last_login_at),
+    username: user?.email ?? '',
     password: '••••••••••••••••',
-  })
+  }
 
   // قفل سكرول الصفحة أثناء فتح قائمة الجوال
   useEffect(() => {
@@ -1737,7 +1769,7 @@ export default function Profile() {
         if (result) {
           setAvatar(result)
           try {
-            localStorage.setItem('user_avatar_kasba', result)
+            localStorage.setItem(avatarKey, result)
           } catch {
             /* التخزين غير متاح */
           }
@@ -1835,7 +1867,7 @@ export default function Profile() {
               </Link>
               <i className="hidden sm:inline fa-solid fa-angle-left text-[10px] text-[#333333] dark:text-slate-400 shrink-0" />
               <span className="font-bold text-[length:inherit] sm:text-[17px] text-[#0b1c30] dark:text-white truncate">
-                الإدارة الطالبة
+                {roleLabel}
               </span>
               <i className="fa-solid fa-angle-left text-[10px] text-[#333333] dark:text-slate-400 shrink-0" />
               <span className="text-[#5e5e5e] dark:text-slate-400 truncate">
@@ -1887,11 +1919,17 @@ export default function Profile() {
               <div className="bg-[#e8f6ff] dark:bg-sky-950/40 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-sky-100/70 dark:border-sky-900/40">
                 <div className="flex items-center gap-4">
                   <div className="relative shrink-0">
-                    <img
-                      src={avatar}
-                      alt="د . محمد كسبة"
-                      className="w-20 h-20 rounded-xl object-cover border-2 border-[#bacfd4] dark:border-slate-800"
-                    />
+                    {avatar ? (
+                      <img
+                        src={avatar}
+                        alt={formData.fullName}
+                        className="w-20 h-20 rounded-xl object-cover border-2 border-[#bacfd4] dark:border-slate-800"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 rounded-xl border-2 border-[#bacfd4] dark:border-slate-800 bg-white dark:bg-[#0f243a] flex items-center justify-center text-3xl font-black text-[#0b2a4a] dark:text-white">
+                        {formData.fullName.trim().charAt(0) || '؟'}
+                      </div>
+                    )}
                     <button
                       type="button"
                       onClick={triggerFileInput}
@@ -1905,10 +1943,10 @@ export default function Profile() {
 
                   <div className="text-right">
                     <h2 className="text-lg lg:text-xl font-black text-[#131e1a] dark:text-white">
-                      د . محمد كسبة
+                      {formData.fullName}
                     </h2>
                     <p className="text-xs sm:text-[13px] text-[#404946] dark:text-slate-400 font-medium mt-0.5">
-                      مهندس أنظمة ومسؤول طلبات الشراء — تقنية المعلومات
+                      {roleLabel} — {departmentName}
                     </p>
                     <button
                       type="button"
@@ -1921,14 +1959,15 @@ export default function Profile() {
                   </div>
                 </div>
 
-                <button
+                {/* زر تعديل البيانات: مخفي لحد ما يصير في endpoint بالباك إند لتعديل الملف الشخصي */}
+                {false && <button
                   type="button"
                   onClick={() => navigate('/edit-profile')}
                   className="px-4 py-2 rounded-xl bg-white dark:bg-[#0f243a] border border-transparent dark:border-slate-700 text-[13px] font-bold text-[#0b2a4a] dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm flex items-center gap-2 cursor-pointer self-end sm:self-center"
                 >
                   <i className="fa-solid fa-pen text-[11px]" />
                   <span>تعديل البيانات</span>
-                </button>
+                </button>}
               </div>
 
               {/* الحقول: padding 24px، والمسافة العمودية بين الصفوف 16px */}
@@ -1960,32 +1999,6 @@ export default function Profile() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div className="text-right">
-                    <label className="block text-xs sm:text-[13px] font-semibold text-[#131e1a] dark:text-slate-300 mb-1.5">
-                      رقم الهاتف الجوال *
-                    </label>
-                    <input
-                      type="text"
-                      dir="ltr"
-                      disabled
-                      value={formData.phone}
-                      className={`${inputBase} text-right`}
-                    />
-                  </div>
-
-                  <div className="text-right">
-                    <label className="block text-xs sm:text-[13px] font-semibold text-[#131e1a] dark:text-slate-300 mb-1.5">
-                      المسمى الوظيفي الداخلي *
-                    </label>
-                    <input
-                      type="text"
-                      disabled
-                      value={formData.internalRole}
-                      className={inputBase}
-                    />
-                  </div>
-                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="text-right">
@@ -2002,17 +2015,17 @@ export default function Profile() {
 
                   <div className="text-right">
                     <label className="block text-xs sm:text-[13px] font-semibold text-[#131e1a] dark:text-slate-300 mb-1.5">
-                      الرقم الوظيفي
+                      آخر تسجيل دخول
                     </label>
                     <div className="relative">
                       <input
                         type="text"
                         disabled
-                        value={formData.empId}
+                        value={formData.lastLogin}
                         className="w-full h-12 pr-4 pl-14 rounded-full bg-[#e8f6ff] dark:bg-sky-950/40 border border-transparent text-sm font-bold text-[#404946] dark:text-white outline-none cursor-default"
                       />
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[11px] font-medium text-[#707975] dark:text-slate-500">
-                        (ثابت)
+                        
                       </span>
                     </div>
                   </div>
@@ -2081,7 +2094,7 @@ export default function Profile() {
                       المؤسسة / الجهة الحكومية
                     </p>
                     <p className="text-base font-bold text-[#131e1a] dark:text-white">
-                      جامعة الأزهر / المنظومة المؤسسية
+                      {organizationName}
                     </p>
                   </div>
 
@@ -2091,25 +2104,17 @@ export default function Profile() {
                     </p>
                     <p className="text-base font-bold text-[#131e1a] dark:text-white flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#0077FF] shrink-0" />
-                      <span>الإدارة الطالبة (تقنية المعلومات)</span>
+                      <span>{departmentName}</span>
                     </p>
                   </div>
 
-                  <div className="pb-3 border-b border-[#eceeed] dark:border-slate-800">
-                    <p className="text-xs sm:text-[13px] font-medium text-[#404946] dark:text-slate-500 mb-0.5">
-                      المسمى الوظيفي المعتمد
-                    </p>
-                    <p className="text-base font-bold text-[#131e1a] dark:text-white">
-                      مهندس نظم وتطبيقات أول
-                    </p>
-                  </div>
 
                   <div className="pb-4 border-b border-[#eceeed] dark:border-slate-800">
                     <p className="text-xs sm:text-[13px] font-medium text-[#404946] dark:text-slate-500 mb-0.5">
                       دور المستخدم في المنظومة
                     </p>
                     <div className="mt-2.5 inline-block min-w-[197px] px-3 py-1 rounded bg-[#e8f6ff] dark:bg-sky-950/50 text-[#0b2a4a] dark:text-slate-200 text-[13px] leading-[18px] font-bold text-right">
-                      منشئ طلبات شراء معتمد
+                      {roleLabel}
                     </div>
                   </div>
 
@@ -2119,7 +2124,7 @@ export default function Profile() {
                     </p>
                     <p className="text-sm font-bold text-[#131e1a] dark:text-white flex items-center gap-1.5">
                       <CalendarCheckIcon className="w-3.5 h-3.5 shrink-0 text-[#707975] dark:text-slate-400" />
-                      <span>1444/03/12 هـ (2022/10/08 م)</span>
+                      <span>{formatDualDate(user?.created_at)}</span>
                     </p>
                   </div>
                 </div>
