@@ -1,9 +1,8 @@
 import { useCallback, useState } from 'react'
 
-// قراءة/حفظ آمنة لو التخزين مش متاح
 function getSavedTheme() {
   try {
-    return localStorage.getItem('theme')
+    return typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null
   } catch {
     return null
   }
@@ -11,18 +10,15 @@ function getSavedTheme() {
 
 function saveTheme(theme) {
   try {
-    localStorage.setItem('theme', theme)
-  } catch {
-    /* التخزين غير متاح */
-  }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('theme', theme)
+    }
+  } catch {}
 }
 
-/**
- * الوضع المظلم: يعتمد على كلاس "dark" على عنصر <html>.
- * الحالة الأولية تُقرأ من العنصر نفسه (الذي ضبطه سكربت index.html قبل الرسم).
- */
 export function useTheme() {
   const [isDark, setIsDark] = useState(() => {
+    if (typeof document === 'undefined') return false
     const fromDom = document.documentElement.classList.contains('dark')
     return fromDom || getSavedTheme() === 'dark'
   })
@@ -30,7 +26,9 @@ export function useTheme() {
   const toggleTheme = useCallback(() => {
     setIsDark((prev) => {
       const next = !prev
-      document.documentElement.classList.toggle('dark', next)
+      if (typeof document !== 'undefined') {
+        document.documentElement.classList.toggle('dark', next)
+      }
       saveTheme(next ? 'dark' : 'light')
       return next
     })

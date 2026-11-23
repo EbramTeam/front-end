@@ -94,8 +94,8 @@ export default function Hero() {
             تعرف على المنصة
           </a>
 
-          <Link
-            to={authed ? '/dashboard' : '/login'}
+          <a
+            href="#contact"
             className="group inline-flex items-center gap-2 rounded-full
               px-6 sm:px-8 py-2.5 sm:py-3
               text-sm sm:text-base font-bold text-white
@@ -111,8 +111,8 @@ export default function Hero() {
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H5m7-7-7 7 7 7"></path>
             </svg>
-            <span className="text-[#000000]">{authed ? 'لوحة التحكم' : 'ابدأ الآن'}</span>
-          </Link>
+            <span className="text-[#000000]">ابدأ الآن</span>
+          </a>
         </div>
       </section>
     </>

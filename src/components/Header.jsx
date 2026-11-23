@@ -82,13 +82,13 @@ export default function Header({ isDark, onToggleTheme }) {
       {/* 3. الأزرار وأيقونات اليسار */}
       <div className="flex flex-1 basis-0 items-center justify-start gap-1 sm:gap-4">
         {/* زر ابدأ الآن بتدرج من اليمين #00ADF1 إلى اليسار #0079E2 مطابق للصورة */}
-        <Link
-          to={authed ? '/dashboard' : '/login'}
+        <a
+          href="#contact"
           className="hidden sm:inline-block shrink-0 whitespace-nowrap text-[#000000] font-semibold px-6 py-2.5 rounded-full shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-105 hover:-translate-y-1 transition-all duration-300 text-sm cursor-pointer"
           style={startGradient}
         >
-          {authed ? 'لوحة التحكم' : 'ابدأ الآن'}
-        </Link>
+          ابدأ الآن
+        </a>
 
         <LanguageMenu />
 
@@ -154,14 +154,14 @@ export default function Header({ isDark, onToggleTheme }) {
             </li>
           ))}
         </ul>
-        <Link
-          to={authed ? '/dashboard' : '/login'}
+        <a
+          href="#contact"
           onClick={closeMenu}
           className="sm:hidden mt-2 block text-center text-[#000000] font-semibold px-6 py-3 rounded-full shadow-md shadow-blue-500/20 hover:shadow-blue-500/40 hover:scale-105 hover:-translate-y-0.5 transition-all duration-300 text-sm cursor-pointer"
           style={startGradient}
         >
-          {authed ? 'لوحة التحكم' : 'ابدأ الآن'}
-        </Link>
+          ابدأ الآن
+        </a>
       </div>
     </header>
   )
